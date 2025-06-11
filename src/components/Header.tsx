@@ -2,15 +2,17 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, User, Book } from 'lucide-react';
+import { Search, User, Book, Menu } from 'lucide-react';
 
 const Header = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        {/* Desktop Layout */}
+        <div className="hidden md:flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center">
@@ -46,6 +48,58 @@ const Header = () => {
               免费注册
             </Button>
           </div>
+        </div>
+
+        {/* Mobile Layout */}
+        <div className="md:hidden">
+          {/* Top row with logo and menu button */}
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+                <Book className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold gradient-text">作文助手</h1>
+                <p className="text-xs text-gray-500">Essay Assistant</p>
+              </div>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Search bar row */}
+          <div className="pb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                type="text"
+                placeholder="搜索作文题目..."
+                className="pl-10 pr-4 w-full"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Mobile menu */}
+          {isMenuOpen && (
+            <div className="pb-4 border-t border-gray-200 pt-4">
+              <div className="flex flex-col space-y-2">
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <User className="w-4 h-4 mr-2" />
+                  登录
+                </Button>
+                <Button size="sm" className="gradient-bg text-white w-full">
+                  免费注册
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
