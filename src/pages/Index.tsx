@@ -81,45 +81,55 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="col-span-1 sm:col-span-2 lg:col-span-1">
+          {/* Desktop: 4 columns, Mobile: 2 columns */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            {/* Logo and description - spans 2 columns on mobile */}
+            <div className="col-span-2 lg:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-lg font-bold">作文助手</span>
               </div>
-              <p className="text-gray-400 text-sm lg:text-base">让每个学生都能写出优秀的作文</p>
+              <p className="text-gray-400 text-sm">让每个学生都能写出优秀的作文</p>
             </div>
+            
+            {/* Features column */}
             <div className="col-span-1">
-              <h4 className="font-semibold mb-4 text-sm lg:text-base">功能特色</h4>
-              <ul className="space-y-2 text-gray-400 text-sm lg:text-base">
+              <h4 className="font-semibold mb-4 text-sm">功能特色</h4>
+              <ul className="space-y-2 text-gray-400 text-sm">
                 <li>题目解析</li>
                 <li>范文学习</li>
                 <li>智能批改</li>
                 <li>个性指导</li>
               </ul>
             </div>
+            
+            {/* Grade coverage column */}
             <div className="col-span-1">
-              <h4 className="font-semibold mb-4 text-sm lg:text-base">年级覆盖</h4>
-              <ul className="space-y-2 text-gray-400 text-sm lg:text-base">
+              <h4 className="font-semibold mb-4 text-sm">年级覆盖</h4>
+              <ul className="space-y-2 text-gray-400 text-sm">
                 <li>小学作文</li>
                 <li>初中作文</li>
                 <li>高中作文</li>
                 <li>专项训练</li>
               </ul>
             </div>
-            <div className="col-span-1 sm:col-span-2 lg:col-span-1">
-              <h4 className="font-semibold mb-4 text-sm lg:text-base">联系我们</h4>
-              <ul className="space-y-2 text-gray-400 text-sm lg:text-base">
-                <li className="break-all">客服热线：400-123-4567</li>
-                <li className="break-all">邮箱：help@essay-assistant.com</li>
+            
+            {/* Contact info - spans 2 columns on mobile */}
+            <div className="col-span-2 lg:col-span-1">
+              <h4 className="font-semibold mb-4 text-sm">联系我们</h4>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li>客服热线：400-123-4567</li>
+                <li className="break-words">邮箱：help@essay-assistant.com</li>
                 <li>QQ群：123456789</li>
               </ul>
             </div>
           </div>
+          
+          {/* Copyright */}
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p className="text-sm lg:text-base">&copy; 2024 作文助手. 保留所有权利.</p>
+            <p className="text-sm">&copy; 2024 作文助手. 保留所有权利.</p>
           </div>
         </div>
       </footer>

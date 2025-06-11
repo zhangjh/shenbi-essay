@@ -72,7 +72,22 @@ const Header = () => {
             </Button>
           </div>
 
-          {/* Search bar row */}
+          {/* Mobile menu - now positioned right after the header row */}
+          {isMenuOpen && (
+            <div className="border-t border-gray-200 py-4">
+              <div className="flex flex-col space-y-2">
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <User className="w-4 h-4 mr-2" />
+                  登录
+                </Button>
+                <Button size="sm" className="gradient-bg text-white w-full">
+                  免费注册
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Search bar row - now always visible below menu */}
           <div className="pb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -85,21 +100,6 @@ const Header = () => {
               />
             </div>
           </div>
-
-          {/* Mobile menu */}
-          {isMenuOpen && (
-            <div className="pb-4 border-t border-gray-200 pt-4">
-              <div className="flex flex-col space-y-2">
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <User className="w-4 h-4 mr-2" />
-                  登录
-                </Button>
-                <Button size="sm" className="gradient-bg text-white w-full">
-                  免费注册
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </header>
