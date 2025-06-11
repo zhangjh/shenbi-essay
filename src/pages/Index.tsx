@@ -5,8 +5,7 @@ import HeroSection from '@/components/HeroSection';
 import GradeSelector from '@/components/GradeSelector';
 import EssayTopics from '@/components/EssayTopics';
 import FeatureCard from '@/components/FeatureCard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, FileText, Edit, Search, Users, Upload } from 'lucide-react';
+import { BookOpen, Search, Users, Upload, Edit } from 'lucide-react';
 
 const Index = () => {
   const [selectedGrade, setSelectedGrade] = useState('all');
@@ -73,45 +72,9 @@ const Index = () => {
       </section>
 
       {/* Essay Topics Section */}
-      <section className="py-16 bg-white/50 backdrop-blur-sm">
+      <section className="py-20 bg-white/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <EssayTopics selectedGrade={selectedGrade} />
-        </div>
-      </section>
-
-      {/* Statistics Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">平台数据</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="text-center bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="text-3xl font-bold gradient-text mb-2">10,000+</div>
-                <div className="text-gray-600">作文题目</div>
-              </CardContent>
-            </Card>
-            <Card className="text-center bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="text-3xl font-bold gradient-text mb-2">50,000+</div>
-                <div className="text-gray-600">优秀范文</div>
-              </CardContent>
-            </Card>
-            <Card className="text-center bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="text-3xl font-bold gradient-text mb-2">100,000+</div>
-                <div className="text-gray-600">学生用户</div>
-              </CardContent>
-            </Card>
-            <Card className="text-center bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="text-3xl font-bold gradient-text mb-2">98%</div>
-                <div className="text-gray-600">满意度</div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </section>
 
