@@ -15,19 +15,19 @@ const HeroSection = () => {
       icon: <FileText className="w-6 h-6 text-white" />,
       title: "优秀范文",
       description: "精选各年级段优秀作文范例，学习写作技巧",
-      color: "bg-education-green-500"
+      color: "bg-blue-500"
     },
     {
       icon: <Edit className="w-6 h-6 text-white" />,
       title: "智能批改",
       description: "AI智能批改系统，提供详细的修改建议",
-      color: "bg-purple-500"
+      color: "bg-slate-500"
     },
     {
       icon: <Users className="w-6 h-6 text-white" />,
       title: "个性指导",
       description: "针对不同年级提供个性化的写作指导方案",
-      color: "bg-orange-500"
+      color: "bg-indigo-500"
     }
   ];
 
