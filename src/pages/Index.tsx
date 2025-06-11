@@ -86,10 +86,10 @@ const Index = () => {
             {/* Logo and description - spans 2 columns on mobile */}
             <div className="col-span-2 lg:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white">
+                  <img src="/assets/logo.png" alt="Logo" className="w-6 h-6" />
                 </div>
-                <span className="text-lg font-bold">作文助手</span>
+                <span className="text-lg font-bold">神笔作文</span>
               </div>
               <p className="text-gray-400 text-sm">让每个学生都能写出优秀的作文</p>
             </div>
@@ -120,8 +120,7 @@ const Index = () => {
             <div className="col-span-2 lg:col-span-1">
               <h4 className="font-semibold mb-4 text-sm">联系我们</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
-                <li>客服热线：400-123-4567</li>
-                <li className="break-words">邮箱：help@essay-assistant.com</li>
+                <li className="break-words">邮箱：zhangjh_initial@126.com</li>
                 <li>QQ群：123456789</li>
               </ul>
             </div>
@@ -129,7 +128,7 @@ const Index = () => {
           
           {/* Copyright */}
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p className="text-sm">&copy; 2024 作文助手. 保留所有权利.</p>
+            <p className="text-sm">&copy; 2025 神笔作文. 保留所有权利.</p>
           </div>
         </div>
       </footer>

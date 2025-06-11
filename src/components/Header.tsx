@@ -15,11 +15,11 @@ const Header = () => {
         <div className="hidden md:flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center">
-              <Book className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+              <img src="/assets/logo.png" alt="Logo" className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold gradient-text">作文助手</h1>
+              <h1 className="text-xl font-bold gradient-text">神笔作文</h1>
               <p className="text-xs text-gray-500">Essay Writing Assistant</p>
             </div>
           </div>
@@ -59,8 +59,8 @@ const Header = () => {
                 <Book className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold gradient-text">作文助手</h1>
-                <p className="text-xs text-gray-500">Essay Assistant</p>
+                <h1 className="text-lg font-bold gradient-text">神笔作文</h1>
+                <p className="text-xs text-gray-500">ShenBi Essay Assistant</p>
               </div>
             </div>
             <Button 
