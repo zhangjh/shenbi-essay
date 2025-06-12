@@ -4,9 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Users, FileText, Loader2, Target, Lightbulb, PenTool } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, BookOpen, Users, FileText, Loader2, Target, Lightbulb, PenTool, Brain } from 'lucide-react';
 import { fetchTopicById, EssayTopic } from '@/services/topicService';
 import Header from '@/components/Header';
+import WritingGuide from '@/components/WritingGuide';
+import MindMap from '@/components/MindMap';
 
 const TopicAnalysis = () => {
   const { id } = useParams<{ id: string }>();
@@ -145,68 +148,90 @@ const TopicAnalysis = () => {
           </CardHeader>
         </Card>
 
-        {/* 解析内容 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* 写作要求 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-lg">
-                <Target className="w-5 h-5 mr-2 text-primary" />
-                写作要求
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start">
-                  <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>紧扣题目主题，内容要具体生动</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>结构完整，层次清晰，语言流畅</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>字数不少于{topic.grade === '小学' ? '300' : topic.grade === '初中' ? '600' : '800'}字</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>注意书写工整，标点符号使用正确</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+        {/* 题目解析和脑图分析 */}
+        <Tabs defaultValue="guide" className="mb-8">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="guide" className="flex items-center">
+              <Lightbulb className="w-4 h-4 mr-2" />
+              写作指导
+            </TabsTrigger>
+            <TabsTrigger value="mind" className="flex items-center">
+              <Brain className="w-4 h-4 mr-2" />
+              思维导图
+            </TabsTrigger>
+            <TabsTrigger value="requirements" className="flex items-center">
+              <Target className="w-4 h-4 mr-2" />
+              写作要求
+            </TabsTrigger>
+          </TabsList>
 
-          {/* 写作思路 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-lg">
-                <Lightbulb className="w-5 h-5 mr-2 text-primary" />
-                写作思路
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start">
-                  <span className="font-semibold text-primary mr-2">1.</span>
-                  <span>仔细审题，把握关键词和写作重点</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="font-semibold text-primary mr-2">2.</span>
-                  <span>确定文章中心思想和要表达的情感</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="font-semibold text-primary mr-2">3.</span>
-                  <span>列出写作提纲，安排文章结构</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="font-semibold text-primary mr-2">4.</span>
-                  <span>选择合适的表达方式和修辞手法</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+          <TabsContent value="guide">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <Lightbulb className="w-5 h-5 mr-2 text-primary" />
+                  写作指导
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {topic.guide ? (
+                  <WritingGuide content={topic.guide} />
+                ) : (
+                  <p className="text-gray-500 text-center py-8">暂无写作指导内容</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="mind">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <Brain className="w-5 h-5 mr-2 text-primary" />
+                  思维导图分析
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {topic.mind ? (
+                  <MindMap content={topic.mind} />
+                ) : (
+                  <p className="text-gray-500 text-center py-8">暂无思维导图内容</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="requirements">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <Target className="w-5 h-5 mr-2 text-primary" />
+                  写作要求
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>紧扣题目主题，内容要具体生动</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>结构完整，层次清晰，语言流畅</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>字数不少于{topic.grade === '小学' ? '300' : topic.grade === '初中' ? '600' : '800'}字</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span>注意书写工整，标点符号使用正确</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* 操作按钮 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

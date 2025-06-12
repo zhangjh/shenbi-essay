@@ -6,6 +6,8 @@ export interface ApiEssayTopic {
   category: number; // 0-6 表示不同类型
   desc: string;
   tags: string[];
+  guide?: string; // 写作指导
+  mind?: string; // markdown形式的脑图数据
 }
 
 export interface EssayTopic {
@@ -16,9 +18,11 @@ export interface EssayTopic {
   difficulty: string;
   description: string;
   tags: string[];
+  guide?: string;
+  mind?: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
+const API_BASE_URL = 'https://tx.zhangjh.cn/shenbi';
 
 // 映射函数
 const mapLevelToGrade = (level: number): string => {
@@ -58,7 +62,9 @@ const transformApiDataToEssayTopic = (apiData: ApiEssayTopic): EssayTopic => {
     grade: mapLevelToGrade(apiData.level),
     difficulty: mapDifficultyToText(apiData.difficulty),
     description: apiData.desc,
-    tags: apiData.tags || []
+    tags: apiData.tags || [],
+    guide: apiData.guide,
+    mind: apiData.mind
   };
 };
 
