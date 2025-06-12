@@ -12,7 +12,6 @@ interface EssayTopicsProps {
 
 const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
   const navigate = useNavigate();
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [topics, setTopics] = useState<EssayTopic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,10 +66,6 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
     }
   };
 
-  const handleTopicClick = (topicId: string) => {
-    navigate(`/topic/${topicId}`);
-  };
-
   if (loading) {
     return (
       <div className="space-y-6">
@@ -112,10 +107,8 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
         {filteredTopics.map((topic) => (
           <Card 
             key={topic.id}
-            className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
-              selectedTopic === topic.id ? 'ring-2 ring-primary' : ''
-            }`}
-            onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)}
+            className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            onClick={() => navigate(`/topic/${topic.id}`)}
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between mb-2">
@@ -136,30 +129,13 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
               <CardDescription className="mb-3 leading-relaxed">
                 {topic.description}
               </CardDescription>
-              <div className="flex flex-wrap gap-1 mb-4">
+              <div className="flex flex-wrap gap-1">
                 {topic.tags.map((tag) => (
                   <Badge key={tag} variant="outline" className="text-xs">
                     {tag}
                   </Badge>
                 ))}
               </div>
-              {selectedTopic === topic.id && (
-                <div className="space-y-2 animate-fade-in">
-                  <Button 
-                    className="w-full" 
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTopicClick(topic.id);
-                    }}
-                  >
-                    查看题目解析
-                  </Button>
-                  <Button variant="outline" className="w-full" size="sm">
-                    查看范文
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
         ))}
