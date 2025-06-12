@@ -1,58 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Users, FileText } from 'lucide-react';
-
-interface EssayTopic {
-  id: string;
-  title: string;
-  type: string;
-  grade: string;
-  difficulty: string;
-  description: string;
-  tags: string[];
-}
-
-const mockTopics: EssayTopic[] = [
-  {
-    id: '1',
-    title: '我的理想',
-    type: '记叙文',
-    grade: '小学',
-    difficulty: '简单',
-    description: '写一篇关于自己理想的作文，表达对未来的憧憬和努力方向。',
-    tags: ['理想', '未来', '成长']
-  },
-  {
-    id: '2',
-    title: '环境保护的重要性',
-    type: '议论文',
-    grade: '初中',
-    difficulty: '中等',
-    description: '论述环境保护的重要性，提出具体的保护措施和建议。',
-    tags: ['环保', '议论文', '社会责任']
-  },
-  {
-    id: '3',
-    title: '科技改变生活',
-    type: '说明文',
-    grade: '高中',
-    difficulty: '困难',
-    description: '分析科技发展对现代生活的影响，举例说明科技带来的变化。',
-    tags: ['科技', '生活', '说明文']
-  },
-  {
-    id: '4',
-    title: '难忘的一天',
-    type: '记叙文',
-    grade: '小学',
-    difficulty: '简单',
-    description: '记录一个特别难忘的日子，描述具体的事件和感受。',
-    tags: ['记叙', '回忆', '情感']
-  }
-];
+import { BookOpen, Users, FileText, Loader2 } from 'lucide-react';
+import { fetchEssayTopics, EssayTopic } from '@/services/topicService';
 
 interface EssayTopicsProps {
   selectedGrade: string;
@@ -60,10 +12,31 @@ interface EssayTopicsProps {
 
 const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [topics, setTopics] = useState<EssayTopic[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadTopics = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchEssayTopics();
+        setTopics(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '获取数据失败');
+        console.error('Error loading topics:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTopics();
+  }, []);
 
   const filteredTopics = selectedGrade === 'all' 
-    ? mockTopics 
-    : mockTopics.filter(topic => {
+    ? topics 
+    : topics.filter(topic => {
         if (selectedGrade === 'elementary') return topic.grade === '小学';
         if (selectedGrade === 'middle') return topic.grade === '初中';
         if (selectedGrade === 'high') return topic.grade === '高中';
@@ -83,10 +56,45 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
     switch (type) {
       case '记叙文': return <BookOpen className="w-4 h-4" />;
       case '议论文': return <Users className="w-4 h-4" />;
-      case '说明文': return <FileText className="w-4 h-4" />;
+      case '说明文': 
+      case '应用文': 
+      case '散文':
+      case '小说':
+      case '其他':
+        return <FileText className="w-4 h-4" />;
       default: return <BookOpen className="w-4 h-4" />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">精选作文题目</h2>
+          <p className="text-gray-600">根据年级筛选，找到最适合的练习题目</p>
+        </div>
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <span className="ml-2 text-gray-600">正在加载题目...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">精选作文题目</h2>
+          <p className="text-gray-600">根据年级筛选，找到最适合的练习题目</p>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>重新加载</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
