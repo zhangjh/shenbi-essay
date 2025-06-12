@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, BookOpen, Users, FileText, Loader2, Target, Lightbulb, PenTool, Brain, Star } from 'lucide-react';
+import { ArrowLeft, BookOpen, Users, FileText, Loader2, Target, Lightbulb, PenTool, Brain, Star, Edit } from 'lucide-react';
 import { fetchTopicById, EssayTopic } from '@/services/topicService';
 import { fetchEssayByTopic } from '@/services/essayService';
 import Header from '@/components/Header';
@@ -29,6 +29,7 @@ const TopicAnalysis = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showEssayDialog, setShowEssayDialog] = useState(false);
+  const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [essays, setEssays] = useState<Essay[]>([]);
   const [selectedEssayId, setSelectedEssayId] = useState<string>('');
   const [loadingEssay, setLoadingEssay] = useState(false);
@@ -68,6 +69,12 @@ const TopicAnalysis = () => {
 
     loadTopic();
   }, [id]);
+
+  const handleStartWriting = () => {
+    if (!id) return;
+    // navigate(`/topic/${id}/write`);
+    setShowFeatureDialog(true);
+  };
 
   const handleViewEssay = async () => {
     if (!id) return;
@@ -279,23 +286,32 @@ const TopicAnalysis = () => {
         </Tabs>
 
         {/* 操作按钮 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Button 
-            className="h-12" 
-            onClick={handleViewEssay}
-            disabled={loadingEssay}
-          >
-            {loadingEssay ? (
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-            ) : (
-              <PenTool className="w-5 h-5 mr-2" />
-            )}
-            {loadingEssay ? '加载中...' : '查看优秀范文'}
-          </Button>
-          <Button variant="outline" className="h-12">
-            <FileText className="w-5 h-5 mr-2" />
-            下载题目解析
-          </Button>
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              className="flex-1 h-12 text-lg" 
+              onClick={handleViewEssay}
+              disabled={loadingEssay}
+            >
+              {loadingEssay ? (
+                <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+              ) : (
+                <BookOpen className="w-6 h-6 mr-2" />
+              )}
+              {loadingEssay ? '加载中...' : '查看优秀范文'}
+            </Button>
+            <Button 
+              className="flex-1 h-12 text-lg" 
+              variant="secondary"
+              onClick={handleStartWriting}
+            >
+              <PenTool className="w-6 h-6 mr-2" />
+              开始写作
+            </Button>
+          </div>
+          <p className="text-center text-sm text-muted-foreground">
+            建议先阅读题目解析和范文，理解写作要求后再开始写作
+          </p>
         </div>
 
         {/* 范文对话框 */}
@@ -348,6 +364,21 @@ const TopicAnalysis = () => {
                   </Tabs>
                 </>
               ) : null}
+            </div>
+          </DialogContent>
+        </Dialog>
+        
+        {/* 功能未实现提示弹框 */}
+        <Dialog open={showFeatureDialog} onOpenChange={setShowFeatureDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>功能提示</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-center text-gray-700">该功能暂未实现，敬请期待！</p>
+            </div>
+            <div className="flex justify-center">
+              <Button onClick={() => setShowFeatureDialog(false)}>确定</Button>
             </div>
           </DialogContent>
         </Dialog>
