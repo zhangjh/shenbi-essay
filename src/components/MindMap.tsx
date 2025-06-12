@@ -27,7 +27,6 @@ const MindMap = ({ content }: MindMapProps) => {
     } else {
       // 创建新的 markmap 实例
       mmRef.current = Markmap.create(svgRef.current, {
-        colorFreezeLevel: 2,
         maxWidth: 300,
         spacingVertical: 5,
         spacingHorizontal: 80,
