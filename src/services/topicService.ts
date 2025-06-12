@@ -71,7 +71,7 @@ const transformApiDataToEssayTopic = (apiData: ApiEssayTopic): EssayTopic => {
 
 export const fetchEssayTopics = async (): Promise<EssayTopic[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/topic?important=1&pageSize=9`, {
+    const response = await fetch(`${API_BASE_URL}/topic?important=1&pageSize=27`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
