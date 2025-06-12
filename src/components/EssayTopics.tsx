@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ interface EssayTopicsProps {
 }
 
 const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
+  const navigate = useNavigate();
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [topics, setTopics] = useState<EssayTopic[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,10 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
         return <FileText className="w-4 h-4" />;
       default: return <BookOpen className="w-4 h-4" />;
     }
+  };
+
+  const handleTopicClick = (topicId: string) => {
+    navigate(`/topic/${topicId}`);
   };
 
   if (loading) {
@@ -140,7 +145,14 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
               </div>
               {selectedTopic === topic.id && (
                 <div className="space-y-2 animate-fade-in">
-                  <Button className="w-full" size="sm">
+                  <Button 
+                    className="w-full" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleTopicClick(topic.id);
+                    }}
+                  >
                     查看题目解析
                   </Button>
                   <Button variant="outline" className="w-full" size="sm">

@@ -1,4 +1,3 @@
-
 export interface ApiEssayTopic {
   id: string;
   title: string;
@@ -79,5 +78,24 @@ export const fetchEssayTopics = async (): Promise<EssayTopic[]> => {
   } catch (error) {
     console.error('Failed to fetch essay topics:', error);
     throw new Error('获取作文题目失败');
+  }
+};
+
+export const fetchTopicById = async (id: string): Promise<EssayTopic> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/topic/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    const res = await response.json();
+    if(!res.success) {
+      throw new Error(res.errorMsg);
+    }
+    return transformApiDataToEssayTopic(res.data);
+  } catch (error) {
+    console.error('Failed to fetch topic by id:', error);
+    throw new Error('获取题目详情失败');
   }
 };
