@@ -1,15 +1,26 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, BookOpen, Users, FileText, Loader2, Target, Lightbulb, PenTool, Brain } from 'lucide-react';
+import { ArrowLeft, BookOpen, Users, FileText, Loader2, Target, Lightbulb, PenTool, Brain, Star } from 'lucide-react';
 import { fetchTopicById, EssayTopic } from '@/services/topicService';
+import { fetchEssayByTopic } from '@/services/essayService';
 import Header from '@/components/Header';
 import WritingGuide from '@/components/WritingGuide';
 import MindMap from '@/components/MindMap';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+interface Essay {
+  id: string;
+  title: string;
+  essay: string;
+  author?: string;
+  score?: number;
+}
 
 const TopicAnalysis = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +28,11 @@ const TopicAnalysis = () => {
   const [topic, setTopic] = useState<EssayTopic | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showEssayDialog, setShowEssayDialog] = useState(false);
+  const [essays, setEssays] = useState<Essay[]>([]);
+  const [selectedEssayId, setSelectedEssayId] = useState<string>('');
+  const [loadingEssay, setLoadingEssay] = useState(false);
+  const [essayError, setEssayError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadTopic = async () => {
@@ -52,6 +68,35 @@ const TopicAnalysis = () => {
 
     loadTopic();
   }, [id]);
+
+  const handleViewEssay = async () => {
+    if (!id) return;
+    
+    try {
+      setLoadingEssay(true);
+      setEssayError(null);
+      const response = await fetchEssayByTopic(id);
+      
+      if (response.success && response.data) {
+        setEssays(response.data);
+        if (response.data.length > 0) {
+          setSelectedEssayId(response.data[0].id);
+          setShowEssayDialog(true);
+        } else {
+          setEssayError('暂无范文');
+        }
+      } else {
+        setEssayError(response.errorMsg || '获取范文失败');
+      }
+    } catch (err) {
+      setEssayError('获取范文失败，请稍后重试');
+      console.error('Error fetching essay:', err);
+    } finally {
+      setLoadingEssay(false);
+    }
+  };
+
+  const selectedEssay = essays.find(essay => essay.id === selectedEssayId);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -235,15 +280,77 @@ const TopicAnalysis = () => {
 
         {/* 操作按钮 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Button className="h-12">
-            <PenTool className="w-5 h-5 mr-2" />
-            查看优秀范文
+          <Button 
+            className="h-12" 
+            onClick={handleViewEssay}
+            disabled={loadingEssay}
+          >
+            {loadingEssay ? (
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            ) : (
+              <PenTool className="w-5 h-5 mr-2" />
+            )}
+            {loadingEssay ? '加载中...' : '查看优秀范文'}
           </Button>
           <Button variant="outline" className="h-12">
             <FileText className="w-5 h-5 mr-2" />
             下载题目解析
           </Button>
         </div>
+
+        {/* 范文对话框 */}
+        <Dialog open={showEssayDialog} onOpenChange={setShowEssayDialog}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>优秀范文</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              {essayError ? (
+                <p className="text-red-500 text-center py-4">{essayError}</p>
+              ) : essays.length > 0 ? (
+                <>
+                  <Tabs
+                    value={selectedEssayId}
+                    onValueChange={setSelectedEssayId}
+                    className="w-full"
+                  >
+                    <TabsList className="w-full flex-wrap h-auto gap-2 bg-transparent">
+                      {essays.map((essay) => (
+                        <TabsTrigger
+                          key={essay.id}
+                          value={essay.id}
+                          className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                        >
+                          <span>{essay.title || `范文${essays.indexOf(essay) + 1}`}</span>
+                          {essay.score && (
+                            <div className="flex items-center text-yellow-500">
+                              <Star className="w-4 h-4 fill-current" />
+                              <span className="ml-1">{essay.score}</span>
+                            </div>
+                          )}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                    {selectedEssay && (
+                      <div className="mt-4">
+                        {/* {selectedEssay.author && (
+                          <p className="text-sm text-muted-foreground mb-4">
+                            作者：{selectedEssay.author}
+                          </p>
+                        )} */}
+                        <div className="prose prose-sm max-w-none dark:prose-invert">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {selectedEssay.essay}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
+                  </Tabs>
+                </>
+              ) : null}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
