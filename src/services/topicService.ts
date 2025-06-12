@@ -1,13 +1,11 @@
 
-import axios from 'axios';
-
 export interface ApiEssayTopic {
   id: string;
   title: string;
   level: number; // 3-12 表示三年级至高三
   difficulty: number; // 0-2 表示简单，中等，困难
   category: number; // 0-6 表示不同类型
-  description: string;
+  desc: string;
   tags: string[];
 }
 
@@ -21,7 +19,7 @@ export interface EssayTopic {
   tags: string[];
 }
 
-const API_BASE_URL = 'https://tx.zhangjh.cn/shenbi';
+const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
 
 // 映射函数
 const mapLevelToGrade = (level: number): string => {
@@ -60,15 +58,24 @@ const transformApiDataToEssayTopic = (apiData: ApiEssayTopic): EssayTopic => {
     type: mapCategoryToType(apiData.category),
     grade: mapLevelToGrade(apiData.level),
     difficulty: mapDifficultyToText(apiData.difficulty),
-    description: apiData.description,
-    tags: apiData.tags
+    description: apiData.desc,
+    tags: apiData.tags || []
   };
 };
 
 export const fetchEssayTopics = async (): Promise<EssayTopic[]> => {
   try {
-    const response = await axios.get<ApiEssayTopic[]>(`${API_BASE_URL}/topic?important=1`);
-    return response.data.map(transformApiDataToEssayTopic);
+    const response = await fetch(`${API_BASE_URL}/topic?important=1&pageSize=9`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    const res = await response.json();
+    if(!res.success) {
+      throw new Error(res.errorMsg);
+    }
+    return res.data.map(transformApiDataToEssayTopic);
   } catch (error) {
     console.error('Failed to fetch essay topics:', error);
     throw new Error('获取作文题目失败');
