@@ -162,14 +162,16 @@ const TopicAnalysis = () => {
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 返回按钮 */}
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')}
-          className="mb-6 text-gray-600 hover:text-gray-800"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          返回题目列表
-        </Button>
+        <div className="flex justify-start mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            返回题目列表
+          </Button>
+        </div>
 
         {/* 题目标题卡片 */}
         <Card className="mb-8">
@@ -187,7 +189,7 @@ const TopicAnalysis = () => {
               </div>
             </div>
             <CardTitle className="text-2xl md:text-3xl">{topic.title}</CardTitle>
-            <CardDescription className="text-base leading-relaxed mt-4">
+            <CardDescription className="text-base leading-relaxed mt-4 text-left">
               {topic.description}
             </CardDescription>
             <div className="flex flex-wrap gap-2 mt-4">
@@ -227,7 +229,9 @@ const TopicAnalysis = () => {
               </CardHeader>
               <CardContent>
                 {topic.guide ? (
-                  <WritingGuide content={topic.guide} />
+                  <div className="text-left">
+                    <WritingGuide content={topic.guide} />
+                  </div>
                 ) : (
                   <p className="text-gray-500 text-center py-8">暂无写作指导内容</p>
                 )}
