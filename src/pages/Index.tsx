@@ -1,4 +1,6 @@
+
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import GradeSelector from '@/components/GradeSelector';
@@ -7,6 +9,7 @@ import FeatureCard from '@/components/FeatureCard';
 import { BookOpen, Search, Users, Upload, Edit } from 'lucide-react';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [selectedGrade, setSelectedGrade] = useState('elementary');
 
   const mainFeatures = [
@@ -15,7 +18,7 @@ const Index = () => {
       description: "获得详细的题目分析和思维导图，理解写作要求和思路",
       icon: <Search className="w-8 h-8 text-white" />,
       buttonText: "开始解析",
-      onButtonClick: () => console.log("Start analysis")
+      onButtonClick: () => navigate('/topics')
     },
     {
       title: "上传题目",

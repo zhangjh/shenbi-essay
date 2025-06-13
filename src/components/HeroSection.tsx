@@ -2,8 +2,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, Users, FileText, Edit } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   const features = [
     {
       icon: <BookOpen className="w-6 h-6 text-white" />,
@@ -51,10 +54,19 @@ const HeroSection = () => {
             从题目解析到范文学习，从智能批改到个性指导，助力每一位学生提升写作水平。
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="gradient-bg text-white px-8 py-6 text-lg rounded-full hover:shadow-xl transition-all duration-300">
+            <Button 
+              size="lg" 
+              className="gradient-bg text-white px-8 py-6 text-lg rounded-full hover:shadow-xl transition-all duration-300"
+              onClick={() => navigate('/topics')}
+            >
               开始写作之旅
             </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-lg rounded-full border-2 hover:shadow-lg transition-all duration-300">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="px-8 py-6 text-lg rounded-full border-2 hover:shadow-lg transition-all duration-300"
+              onClick={() => navigate('/topics')}
+            >
               查看题目库
             </Button>
           </div>
