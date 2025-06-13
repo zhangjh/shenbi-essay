@@ -82,11 +82,11 @@ const TopicLibrary = () => {
   }, []);
 
   const handleFiltersChange = (newFilters: FilterState) => {
+    setCurrentPage(1);
     setFilters(newFilters);
   };
 
   const handleSearch = () => {
-    setCurrentPage(1);
     updateSearchParams(filters, 1);
     refetch();
   };

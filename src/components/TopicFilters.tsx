@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -117,7 +116,7 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
     return subCategoryMap[filters.category] || [];
   };
 
-  const updateFilter = (key: keyof FilterState, value: any) => {
+  const updateFilter = (key: keyof FilterState, value: string | number | undefined) => {
     const newFilters = {
       ...filters,
       [key]: value
@@ -305,11 +304,11 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
           </div>
 
           {/* 操作按钮 - 左对齐 */}
-          <div className="flex justify-between items-center pt-2">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center gap-2">
               {activeFiltersCount > 0 && (
                 <>
-                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                  <Badge variant="secondary" className="bg-primary/10 text-primary h-8 px-3 flex items-center">
                     <Filter className="h-3 w-3 mr-1" />
                     {activeFiltersCount} 个筛选条件
                   </Badge>
@@ -327,7 +326,7 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
             </div>
             <Button 
               onClick={onSearch}
-              className="h-10 px-6 bg-primary hover:bg-primary/90"
+              className="h-10 px-6 bg-primary hover:bg-primary/90 w-full sm:w-auto"
             >
               <Search className="h-4 w-4 mr-2" />
               搜索题目
