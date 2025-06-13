@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -51,15 +51,41 @@ const categoryOptions = [
   { value: '6', label: '其他' },
 ];
 
-const subCategoryOptions = [
-  { value: 'all', label: '全部子分类' },
-  { value: '0', label: '写人记事' },
-  { value: '1', label: '写景状物' },
-  { value: '2', label: '想象作文' },
-  { value: '3', label: '读后感' },
-  { value: '4', label: '应用写作' },
-  { value: '5', label: '话题作文' },
-];
+// 子分类映射关系
+const subCategoryMap: Record<number, { value: string; label: string }[]> = {
+  0: [
+    { value: '0', label: '记人' },
+    { value: '1', label: '写景' },
+    { value: '2', label: '叙事' },
+    { value: '3', label: '状物' },
+  ],
+  1: [
+    { value: '0', label: '实体事物' },
+    { value: '1', label: '事理' },
+    { value: '2', label: '科学小品' },
+  ],
+  2: [
+    { value: '0', label: '书信' },
+    { value: '1', label: '公文' },
+    { value: '2', label: '契据' },
+  ],
+  3: [
+    { value: '0', label: '立论' },
+    { value: '1', label: '驳论' },
+  ],
+  4: [
+    { value: '0', label: '抒情散文' },
+    { value: '1', label: '叙事散文' },
+    { value: '2', label: '议论散文' },
+  ],
+  5: [
+    { value: '0', label: '短篇小说' },
+    { value: '1', label: '微型小说' },
+  ],
+  6: [
+    { value: '0', label: '其他' },
+  ],
+};
 
 const difficultyOptions = [
   { value: 'all', label: '全部难度' },
@@ -83,11 +109,26 @@ const sourceOptions = [
 const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFiltersProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // 获取当前可用的子分类选项
+  const getAvailableSubCategories = () => {
+    if (filters.category === undefined) {
+      return [];
+    }
+    return subCategoryMap[filters.category] || [];
+  };
+
   const updateFilter = (key: keyof FilterState, value: any) => {
-    onFiltersChange({
+    const newFilters = {
       ...filters,
       [key]: value
-    });
+    };
+
+    // 如果分类改变，清空子分类
+    if (key === 'category') {
+      newFilters.sub_category = undefined;
+    }
+
+    onFiltersChange(newFilters);
   };
 
   const getActiveFiltersCount = () => {
@@ -103,6 +144,7 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
   };
 
   const activeFiltersCount = getActiveFiltersCount();
+  const availableSubCategories = getAvailableSubCategories();
 
   return (
     <Card className="mb-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
@@ -119,8 +161,8 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
             />
           </div>
 
-          {/* 快捷筛选 */}
-          <div className="flex flex-wrap gap-3">
+          {/* 快捷筛选 - 左对齐 */}
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="featured"
@@ -143,160 +185,144 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
             </div>
           </div>
 
-          {/* 展开/收起高级筛选 */}
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="h-auto p-0 font-medium text-primary hover:text-primary/80"
-            >
-              高级筛选
-              {isExpanded ? (
-                <ChevronUp className="ml-2 h-4 w-4" />
-              ) : (
-                <ChevronDown className="ml-2 h-4 w-4" />
-              )}
-            </Button>
-            {activeFiltersCount > 0 && (
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
-                <Filter className="h-3 w-3 mr-1" />
-                {activeFiltersCount} 个筛选条件
-              </Badge>
-            )}
+          {/* 主要筛选条件 - 左对齐 */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">年级</Label>
+              <Select
+                value={filters.level?.toString() || 'all'}
+                onValueChange={(value) => updateFilter('level', value === 'all' ? undefined : parseInt(value))}
+              >
+                <SelectTrigger className="h-9 bg-white border-gray-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {gradeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">分类</Label>
+              <Select
+                value={filters.category?.toString() || 'all'}
+                onValueChange={(value) => updateFilter('category', value === 'all' ? undefined : parseInt(value))}
+              >
+                <SelectTrigger className="h-9 bg-white border-gray-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {categoryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">子分类</Label>
+              <Select
+                value={filters.sub_category?.toString() || 'all'}
+                onValueChange={(value) => updateFilter('sub_category', value === 'all' ? undefined : parseInt(value))}
+                disabled={filters.category === undefined}
+              >
+                <SelectTrigger className="h-9 bg-white border-gray-200">
+                  <SelectValue placeholder={filters.category === undefined ? "先选择分类" : "选择子分类"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部子分类</SelectItem>
+                  {availableSubCategories.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">难度</Label>
+              <Select
+                value={filters.difficulty?.toString() || 'all'}
+                onValueChange={(value) => updateFilter('difficulty', value === 'all' ? undefined : parseInt(value))}
+              >
+                <SelectTrigger className="h-9 bg-white border-gray-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {difficultyOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">精选状态</Label>
+              <Select
+                value={filters.important?.toString() || 'all'}
+                onValueChange={(value) => updateFilter('important', value === 'all' ? undefined : parseInt(value))}
+              >
+                <SelectTrigger className="h-9 bg-white border-gray-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {importantOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">题目来源</Label>
+              <Select
+                value={filters.source || 'all'}
+                onValueChange={(value) => updateFilter('source', value === 'all' ? '' : value)}
+              >
+                <SelectTrigger className="h-9 bg-white border-gray-200">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {sourceOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* 高级筛选条件 */}
-          {isExpanded && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 p-4 bg-gray-50/50 rounded-lg border border-gray-100">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">年级</Label>
-                <Select
-                  value={filters.level?.toString() || 'all'}
-                  onValueChange={(value) => updateFilter('level', value === 'all' ? undefined : parseInt(value))}
-                >
-                  <SelectTrigger className="h-9 bg-white border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {gradeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">分类</Label>
-                <Select
-                  value={filters.category?.toString() || 'all'}
-                  onValueChange={(value) => updateFilter('category', value === 'all' ? undefined : parseInt(value))}
-                >
-                  <SelectTrigger className="h-9 bg-white border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categoryOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">子分类</Label>
-                <Select
-                  value={filters.sub_category?.toString() || 'all'}
-                  onValueChange={(value) => updateFilter('sub_category', value === 'all' ? undefined : parseInt(value))}
-                >
-                  <SelectTrigger className="h-9 bg-white border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subCategoryOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">难度</Label>
-                <Select
-                  value={filters.difficulty?.toString() || 'all'}
-                  onValueChange={(value) => updateFilter('difficulty', value === 'all' ? undefined : parseInt(value))}
-                >
-                  <SelectTrigger className="h-9 bg-white border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {difficultyOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">精选状态</Label>
-                <Select
-                  value={filters.important?.toString() || 'all'}
-                  onValueChange={(value) => updateFilter('important', value === 'all' ? undefined : parseInt(value))}
-                >
-                  <SelectTrigger className="h-9 bg-white border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {importantOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">题目来源</Label>
-                <Select
-                  value={filters.source || 'all'}
-                  onValueChange={(value) => updateFilter('source', value === 'all' ? '' : value)}
-                >
-                  <SelectTrigger className="h-9 bg-white border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sourceOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-
-          {/* 操作按钮 */}
+          {/* 操作按钮 - 左对齐 */}
           <div className="flex justify-between items-center pt-2">
             <div className="flex items-center gap-2">
               {activeFiltersCount > 0 && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={onReset}
-                  className="h-8 px-3 text-xs hover:bg-gray-50"
-                >
-                  <X className="h-3 w-3 mr-1" />
-                  清空筛选
-                </Button>
+                <>
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    <Filter className="h-3 w-3 mr-1" />
+                    {activeFiltersCount} 个筛选条件
+                  </Badge>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={onReset}
+                    className="h-8 px-3 text-xs hover:bg-gray-50"
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    清空筛选
+                  </Button>
+                </>
               )}
             </div>
             <Button 
