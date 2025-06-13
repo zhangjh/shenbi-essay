@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, X } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Search, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 
 export interface FilterState {
   title: string;
@@ -15,6 +16,7 @@ export interface FilterState {
   sub_category: number | undefined;
   important: number | undefined;
   source: string;
+  difficulty: number | undefined;
 }
 
 interface TopicFiltersProps {
@@ -49,6 +51,23 @@ const categoryOptions = [
   { value: '6', label: '其他' },
 ];
 
+const subCategoryOptions = [
+  { value: 'all', label: '全部子分类' },
+  { value: '0', label: '写人记事' },
+  { value: '1', label: '写景状物' },
+  { value: '2', label: '想象作文' },
+  { value: '3', label: '读后感' },
+  { value: '4', label: '应用写作' },
+  { value: '5', label: '话题作文' },
+];
+
+const difficultyOptions = [
+  { value: 'all', label: '全部难度' },
+  { value: '0', label: '简单' },
+  { value: '1', label: '中等' },
+  { value: '2', label: '困难' },
+];
+
 const importantOptions = [
   { value: 'all', label: '全部题目' },
   { value: '1', label: '精选题目' },
@@ -62,6 +81,8 @@ const sourceOptions = [
 ];
 
 const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFiltersProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const updateFilter = (key: keyof FilterState, value: any) => {
     onFiltersChange({
       ...filters,
@@ -77,131 +98,214 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
     if (filters.sub_category !== undefined) count++;
     if (filters.important !== undefined) count++;
     if (filters.source) count++;
+    if (filters.difficulty !== undefined) count++;
     return count;
   };
 
   const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <Card className="mb-6">
-      <CardContent className="pt-6">
-        <div className="space-y-4">
-          {/* 标题搜索 */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <Label htmlFor="title">题目标题</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="title"
-                  placeholder="输入题目标题关键词..."
-                  value={filters.title}
-                  onChange={(e) => updateFilter('title', e.target.value)}
-                  className="pl-10"
-                />
+    <Card className="mb-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+      <CardContent className="p-6">
+        <div className="space-y-6">
+          {/* 搜索栏 */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              placeholder="搜索题目标题..."
+              value={filters.title}
+              onChange={(e) => updateFilter('title', e.target.value)}
+              className="pl-12 h-12 text-base border-gray-200 focus:border-primary focus:ring-primary/20 bg-white/70"
+            />
+          </div>
+
+          {/* 快捷筛选 */}
+          <div className="flex flex-wrap gap-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="featured"
+                checked={filters.important === 1}
+                onCheckedChange={(checked) => updateFilter('important', checked ? 1 : undefined)}
+              />
+              <Label htmlFor="featured" className="text-sm font-medium cursor-pointer">
+                仅显示精选题目
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="system-only"
+                checked={filters.source === 'system'}
+                onCheckedChange={(checked) => updateFilter('source', checked ? 'system' : '')}
+              />
+              <Label htmlFor="system-only" className="text-sm font-medium cursor-pointer">
+                仅显示系统生成
+              </Label>
+            </div>
+          </div>
+
+          {/* 展开/收起高级筛选 */}
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="h-auto p-0 font-medium text-primary hover:text-primary/80"
+            >
+              高级筛选
+              {isExpanded ? (
+                <ChevronUp className="ml-2 h-4 w-4" />
+              ) : (
+                <ChevronDown className="ml-2 h-4 w-4" />
+              )}
+            </Button>
+            {activeFiltersCount > 0 && (
+              <Badge variant="secondary" className="bg-primary/10 text-primary">
+                <Filter className="h-3 w-3 mr-1" />
+                {activeFiltersCount} 个筛选条件
+              </Badge>
+            )}
+          </div>
+
+          {/* 高级筛选条件 */}
+          {isExpanded && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 p-4 bg-gray-50/50 rounded-lg border border-gray-100">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">年级</Label>
+                <Select
+                  value={filters.level?.toString() || 'all'}
+                  onValueChange={(value) => updateFilter('level', value === 'all' ? undefined : parseInt(value))}
+                >
+                  <SelectTrigger className="h-9 bg-white border-gray-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gradeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">分类</Label>
+                <Select
+                  value={filters.category?.toString() || 'all'}
+                  onValueChange={(value) => updateFilter('category', value === 'all' ? undefined : parseInt(value))}
+                >
+                  <SelectTrigger className="h-9 bg-white border-gray-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categoryOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">子分类</Label>
+                <Select
+                  value={filters.sub_category?.toString() || 'all'}
+                  onValueChange={(value) => updateFilter('sub_category', value === 'all' ? undefined : parseInt(value))}
+                >
+                  <SelectTrigger className="h-9 bg-white border-gray-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subCategoryOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">难度</Label>
+                <Select
+                  value={filters.difficulty?.toString() || 'all'}
+                  onValueChange={(value) => updateFilter('difficulty', value === 'all' ? undefined : parseInt(value))}
+                >
+                  <SelectTrigger className="h-9 bg-white border-gray-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {difficultyOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">精选状态</Label>
+                <Select
+                  value={filters.important?.toString() || 'all'}
+                  onValueChange={(value) => updateFilter('important', value === 'all' ? undefined : parseInt(value))}
+                >
+                  <SelectTrigger className="h-9 bg-white border-gray-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {importantOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">题目来源</Label>
+                <Select
+                  value={filters.source || 'all'}
+                  onValueChange={(value) => updateFilter('source', value === 'all' ? '' : value)}
+                >
+                  <SelectTrigger className="h-9 bg-white border-gray-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sourceOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          </div>
-
-          {/* 筛选条件 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <Label>年级</Label>
-              <Select
-                value={filters.level?.toString() || 'all'}
-                onValueChange={(value) => updateFilter('level', value === 'all' ? undefined : parseInt(value))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="选择年级" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gradeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>分类</Label>
-              <Select
-                value={filters.category?.toString() || 'all'}
-                onValueChange={(value) => updateFilter('category', value === 'all' ? undefined : parseInt(value))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="选择分类" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoryOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>精选状态</Label>
-              <Select
-                value={filters.important?.toString() || 'all'}
-                onValueChange={(value) => updateFilter('important', value === 'all' ? undefined : parseInt(value))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="选择状态" />
-                </SelectTrigger>
-                <SelectContent>
-                  {importantOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>题目来源</Label>
-              <Select
-                value={filters.source || 'all'}
-                onValueChange={(value) => updateFilter('source', value === 'all' ? '' : value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="选择来源" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sourceOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          )}
 
           {/* 操作按钮 */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center pt-2">
             <div className="flex items-center gap-2">
               {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <Filter className="h-3 w-3" />
-                  {activeFiltersCount} 个筛选条件
-                </Badge>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={onReset}
+                  className="h-8 px-3 text-xs hover:bg-gray-50"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  清空筛选
+                </Button>
               )}
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={onReset} disabled={activeFiltersCount === 0}>
-                <X className="h-4 w-4 mr-2" />
-                重置
-              </Button>
-              <Button onClick={onSearch}>
-                <Search className="h-4 w-4 mr-2" />
-                搜索
-              </Button>
-            </div>
+            <Button 
+              onClick={onSearch}
+              className="h-10 px-6 bg-primary hover:bg-primary/90"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              搜索题目
+            </Button>
           </div>
         </div>
       </CardContent>

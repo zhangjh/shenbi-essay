@@ -36,6 +36,7 @@ export interface TopicSearchParams {
   sub_category?: number;
   important?: number;
   source?: string;
+  difficulty?: number;
   page?: number;
   pageSize?: number;
 }
@@ -119,6 +120,7 @@ export const searchEssayTopics = async (params: TopicSearchParams): Promise<{ da
     if (params.sub_category !== undefined) searchParams.append('sub_category', params.sub_category.toString());
     if (params.important !== undefined) searchParams.append('important', params.important.toString());
     if (params.source) searchParams.append('source', params.source);
+    if (params.difficulty !== undefined) searchParams.append('difficulty', params.difficulty.toString());
     
     searchParams.append('page', (params.page || 1).toString());
     searchParams.append('pageSize', (params.pageSize || 20).toString());

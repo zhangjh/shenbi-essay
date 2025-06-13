@@ -23,6 +23,7 @@ const TopicLibrary = () => {
     sub_category: searchParams.get('sub_category') ? parseInt(searchParams.get('sub_category')!) : undefined,
     important: searchParams.get('important') ? parseInt(searchParams.get('important')!) : undefined,
     source: searchParams.get('source') || '',
+    difficulty: searchParams.get('difficulty') ? parseInt(searchParams.get('difficulty')!) : undefined,
   });
   
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'));
@@ -38,6 +39,7 @@ const TopicLibrary = () => {
     if (newFilters.sub_category !== undefined) params.set('sub_category', newFilters.sub_category.toString());
     if (newFilters.important !== undefined) params.set('important', newFilters.important.toString());
     if (newFilters.source) params.set('source', newFilters.source);
+    if (newFilters.difficulty !== undefined) params.set('difficulty', newFilters.difficulty.toString());
     if (page > 1) params.set('page', page.toString());
     
     setSearchParams(params);
@@ -97,6 +99,7 @@ const TopicLibrary = () => {
       sub_category: undefined,
       important: undefined,
       source: '',
+      difficulty: undefined,
     };
     setFilters(resetFilters);
     setCurrentPage(1);
