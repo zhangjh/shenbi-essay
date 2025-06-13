@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
@@ -5,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import Index from '@/pages/Index';
 import TopicAnalysis from '@/pages/TopicAnalysis';
 import Writing from '@/pages/Writing';
+import TopicLibrary from '@/pages/TopicLibrary';
 import NotFound from '@/pages/NotFound';
 import './App.css';
 
@@ -18,6 +20,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/topics" element={<TopicLibrary />} />
             <Route path="/topic/:id" element={<TopicAnalysis />} />
             <Route path="/topic/:id/write" element={<Writing />} />
             <Route path="*" element={<NotFound />} />

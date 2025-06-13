@@ -1,13 +1,17 @@
+
 export interface ApiEssayTopic {
   id: string;
   title: string;
   level: number; // 3-12 表示三年级至高三
   difficulty: number; // 0-2 表示简单，中等，困难
   category: number; // 0-6 表示不同类型
+  sub_category: number; // 子分类
   desc: string;
   tags: string[];
   guide?: string; // 写作指导
   mind?: string; // markdown形式的脑图数据
+  source: string; // 来源：system 或其他
+  important: number; // 是否精选：1表示精选，0表示不精选
 }
 
 export interface EssayTopic {
@@ -20,6 +24,20 @@ export interface EssayTopic {
   tags: string[];
   guide?: string;
   mind?: string;
+  source: string;
+  important: boolean;
+  subCategory: number;
+}
+
+export interface TopicSearchParams {
+  title?: string;
+  level?: number;
+  category?: number;
+  sub_category?: number;
+  important?: number;
+  source?: string;
+  page?: number;
+  pageSize?: number;
 }
 
 // const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
@@ -65,7 +83,10 @@ const transformApiDataToEssayTopic = (apiData: ApiEssayTopic): EssayTopic => {
     description: apiData.desc,
     tags: apiData.tags || [],
     guide: apiData.guide,
-    mind: apiData.mind
+    mind: apiData.mind,
+    source: apiData.source,
+    important: apiData.important === 1,
+    subCategory: apiData.sub_category
   };
 };
 
@@ -85,6 +106,42 @@ export const fetchEssayTopics = async (): Promise<EssayTopic[]> => {
   } catch (error) {
     console.error('Failed to fetch essay topics:', error);
     throw new Error('获取作文题目失败');
+  }
+};
+
+export const searchEssayTopics = async (params: TopicSearchParams): Promise<{ data: EssayTopic[], total: number }> => {
+  try {
+    const searchParams = new URLSearchParams();
+    
+    if (params.title) searchParams.append('title', params.title);
+    if (params.level !== undefined) searchParams.append('level', params.level.toString());
+    if (params.category !== undefined) searchParams.append('category', params.category.toString());
+    if (params.sub_category !== undefined) searchParams.append('sub_category', params.sub_category.toString());
+    if (params.important !== undefined) searchParams.append('important', params.important.toString());
+    if (params.source) searchParams.append('source', params.source);
+    
+    searchParams.append('page', (params.page || 1).toString());
+    searchParams.append('pageSize', (params.pageSize || 20).toString());
+
+    const response = await fetch(`${API_BASE_URL}/topic?${searchParams.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const res = await response.json();
+    if(!res.success) {
+      throw new Error(res.errorMsg);
+    }
+    
+    return {
+      data: res.data.map(transformApiDataToEssayTopic),
+      total: res.total || res.data.length
+    };
+  } catch (error) {
+    console.error('Failed to search essay topics:', error);
+    throw new Error('搜索作文题目失败');
   }
 };
 
