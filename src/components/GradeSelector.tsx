@@ -1,9 +1,7 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 const grades = [
-  { id: 'all', name: '全部年级', color: 'bg-gray-100 text-gray-700' },
   { id: 'elementary', name: '小学', color: 'bg-education-blue-100 text-education-blue-700' },
   { id: 'middle', name: '初中', color: 'bg-blue-100 text-blue-700' },
   { id: 'high', name: '高中', color: 'bg-slate-100 text-slate-700' },

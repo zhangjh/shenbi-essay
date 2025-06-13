@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
@@ -8,7 +7,7 @@ import FeatureCard from '@/components/FeatureCard';
 import { BookOpen, Search, Users, Upload, Edit } from 'lucide-react';
 
 const Index = () => {
-  const [selectedGrade, setSelectedGrade] = useState('all');
+  const [selectedGrade, setSelectedGrade] = useState('elementary');
 
   const mainFeatures = [
     {
@@ -40,21 +39,6 @@ const Index = () => {
       
       <HeroSection />
 
-      {/* Grade Selection Section */}
-      <section className="py-16 bg-white/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">选择年级段</h2>
-            <p className="text-gray-600 text-lg">不同年级，不同要求，个性化学习更有效</p>
-          </div>
-          
-          <GradeSelector 
-            selectedGrade={selectedGrade} 
-            onGradeChange={setSelectedGrade} 
-          />
-        </div>
-      </section>
-
       {/* Main Features Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,6 +52,21 @@ const Index = () => {
               <FeatureCard key={index} {...feature} />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Grade Selection Section */}
+      <section className="py-16 bg-white/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">选择年级段</h2>
+            <p className="text-gray-600 text-lg">不同年级，不同要求，个性化学习更有效</p>
+          </div>
+          
+          <GradeSelector 
+            selectedGrade={selectedGrade} 
+            onGradeChange={setSelectedGrade} 
+          />
         </div>
       </section>
 

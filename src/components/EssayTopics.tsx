@@ -34,14 +34,12 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
     loadTopics();
   }, []);
 
-  const filteredTopics = selectedGrade === 'all' 
-    ? topics 
-    : topics.filter(topic => {
-        if (selectedGrade === 'elementary') return topic.grade === '小学';
-        if (selectedGrade === 'middle') return topic.grade === '初中';
-        if (selectedGrade === 'high') return topic.grade === '高中';
-        return true;
-      });
+  const filteredTopics = topics.filter(topic => {
+    if (selectedGrade === 'elementary') return topic.grade === '小学';
+    if (selectedGrade === 'middle') return topic.grade === '初中';
+    if (selectedGrade === 'high') return topic.grade === '高中';
+    return false;
+  });
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
