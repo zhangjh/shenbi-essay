@@ -33,7 +33,7 @@ const Header = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold gradient-text">神笔作文</h1>
-              <p className="text-xs text-gray-500">Essay Writing Assistant</p>
+              <p className="text-xs text-gray-500">ShenBi Essay</p>
             </div>
           </div>
 

@@ -45,10 +45,10 @@ const HeroSection = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+          <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
             让写作变得
             <span className="gradient-text"> 简单有趣</span>
-          </h1>
+          </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
             专为中小学生打造的作文学习平台，提供全方位的写作指导与练习，
             从题目解析到范文学习，从智能批改到个性指导，助力每一位学生提升写作水平。
