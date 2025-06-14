@@ -230,6 +230,14 @@ const EssayGrading = () => {
           <GradingResult 
             result={gradingResult}
             onNewGrading={handleReset}
+            imageUrl={
+              // 如果有上传图片则优先展示对应的base64图片
+              uploadedFile && uploadedFile.type.startsWith('image/')
+                ? (uploadedFile ? URL.createObjectURL(uploadedFile) : undefined)
+                : capturedImage
+                  ? capturedImage
+                  : undefined
+            }
           />
         )}
       </div>

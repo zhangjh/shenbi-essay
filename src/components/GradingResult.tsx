@@ -1,8 +1,10 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { Progress } from "@/components/ui/progress"
+import { CheckCircle, AlertCircle } from 'lucide-react';
+import { Badge } from "@/components/ui/badge"
 
 interface GradingResultProps {
   result: {
@@ -18,16 +20,15 @@ interface GradingResultProps {
     detailedFeedback?: string;
   };
   onNewGrading: () => void;
+  imageUrl?: string;
 }
 
-const GradingResult = ({ result, onNewGrading }: GradingResultProps) => {
+const GradingResult = ({ result, onNewGrading, imageUrl }: GradingResultProps) => {
   const exportResult = () => {
     let content = '';
-    
     if (result.isMarkdown && result.markdownContent) {
       content = result.markdownContent;
     } else {
-      // 向后兼容旧格式
       content = `
 作文批改报告
 =============
@@ -46,7 +47,6 @@ ${result.detailedFeedback}
 生成时间：${new Date().toLocaleString()}
       `;
     }
-    
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -58,35 +58,52 @@ ${result.detailedFeedback}
     URL.revokeObjectURL(url);
   };
 
-  // 如果是 markdown 格式，使用新的渲染方式
+  // 判断是markdown批改结果
   if (result.isMarkdown && result.markdownContent) {
     return (
-      <div className="space-y-6">
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">智能批改结果</CardTitle>
+      <div className="space-y-8">
+        {/* 图片预览区，仅有图片时显示 */}
+        {imageUrl && (
+          <div className="flex flex-col items-center mb-4">
+            <div className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 transition hover:scale-105 w-full max-w-md aspect-[4/3]">
+              {/* 蒙版效果 */}
+              <img
+                src={imageUrl}
+                alt="上传的作文预览"
+                className="object-contain w-full h-full"
+                style={{ maxHeight: 360 }}
+              />
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/60 via-white/20 to-transparent" />
+            </div>
+            <div className="text-xs text-gray-400 mt-1">上传图片预览，仅供核实</div>
+          </div>
+        )}
+
+        <Card className="shadow-xl border-blue-100">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-2xl text-center gradient-text">智能批改结果</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-slate max-w-none">
+            <div className="prose prose-slate max-w-none prose-img:rounded-lg prose-img:shadow prose-p:leading-relaxed">
               <ReactMarkdown
                 className="markdown-content"
                 components={{
-                  h1: ({ children }) => <h1 className="text-2xl font-bold mb-4 text-gray-800">{children}</h1>,
-                  h2: ({ children }) => <h2 className="text-xl font-semibold mb-3 text-gray-700 mt-6">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-lg font-medium mb-2 text-gray-600 mt-4">{children}</h3>,
-                  p: ({ children }) => <p className="mb-3 text-gray-700 leading-relaxed">{children}</p>,
+                  h1: ({ children }) => <h1 className="text-2xl font-bold mb-4 text-sky-950">{children}</h1>,
+                  h2: ({ children }) => <h2 className="text-xl font-semibold mb-3 text-blue-700 mt-6">{children}</h2>,
+                  h3: ({ children }) => <h3 className="text-lg font-medium mb-2 text-blue-600 mt-4">{children}</h3>,
+                  p: ({ children }) => <p className="mb-3 text-gray-800 leading-relaxed">{children}</p>,
                   ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
                   ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
                   li: ({ children }) => <li className="text-gray-700">{children}</li>,
-                  strong: ({ children }) => <strong className="font-semibold text-gray-800">{children}</strong>,
+                  strong: ({ children }) => <strong className="font-semibold text-blue-800">{children}</strong>,
                   blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-blue-500 pl-4 italic bg-blue-50 py-2 my-4">
-                      {children}
-                    </blockquote>
+                    <blockquote className="border-l-4 border-blue-400 pl-5 italic bg-blue-50 py-2 my-4 rounded">{children}</blockquote>
                   ),
                   code: ({ children }) => (
-                    <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{children}</code>
+                    <code className="bg-gray-200 px-2 py-1 rounded text-sm font-mono">{children}</code>
                   ),
+                  img: ({ src, alt }) =>
+                    <img src={src ?? ''} alt={alt} className="mx-auto rounded shadow max-h-64" />
                 }}
               >
                 {result.markdownContent}
@@ -95,7 +112,7 @@ ${result.detailedFeedback}
           </CardContent>
         </Card>
 
-        {/* Action Buttons */}
+        {/* 操作按钮 */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button variant="outline" onClick={exportResult}>
             <Download className="w-4 h-4 mr-2" />
@@ -110,7 +127,6 @@ ${result.detailedFeedback}
     );
   }
 
-  // 向后兼容：使用旧的结构化显示方式
   const percentage = result.score && result.totalScore ? (result.score / result.totalScore) * 100 : 0;
   
   const getGradeColor = (grade?: string) => {
@@ -123,6 +139,22 @@ ${result.detailedFeedback}
 
   return (
     <div className="space-y-6">
+      {/* 图片预览区，仅有图片上传时显示 */}
+      {imageUrl && (
+        <div className="flex flex-col items-center mb-4">
+          <div className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 transition hover:scale-105 w-full max-w-md aspect-[4/3]">
+            <img
+              src={imageUrl}
+              alt="上传的作文预览"
+              className="object-contain w-full h-full"
+              style={{ maxHeight: 360 }}
+            />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/60 via-white/20 to-transparent" />
+          </div>
+          <div className="text-xs text-gray-400 mt-1">上传图片预览，仅供核实</div>
+        </div>
+      )}
+
       {/* Score Overview */}
       <Card className="shadow-lg">
         <CardHeader className="text-center">
