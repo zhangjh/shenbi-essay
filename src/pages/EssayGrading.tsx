@@ -1,6 +1,6 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import imageCompression from 'browser-image-compression';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import CameraCapture from '@/components/CameraCapture';
@@ -10,6 +10,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
+
+interface GradingRequest {
+  title: string;
+  desc: string;
+  level: string;
+  weight: number;
+  essay?: string;
+  fileImg?: string;
+}
 
 const EssayGrading = () => {
   const navigate = useNavigate();
@@ -62,7 +71,7 @@ const EssayGrading = () => {
     setIsAnalyzing(true);
     
     try {
-      let requestData: any = {
+      const requestData: GradingRequest = {
         title: '',
         desc: '',
         level: '',
