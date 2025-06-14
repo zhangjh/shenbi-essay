@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { Badge } from "@/components/ui/badge"
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
 interface GradingResultProps {
   result: {
@@ -61,12 +62,12 @@ const ImageFullscreenPreview = ({
   );
 };
 
-// 预处理文本，将 {red} 和 {blue} 标记转换为特殊的 markdown 格式
+// 预处理文本，将 {red} 和 {blue} 标记转换为 HTML 格式
 const preprocessColorTags = (content: string): string => {
-  // 将 {red}...{/red} 转换为 <span data-color="red">...</span>
-  let processed = content.replace(/\{red\}(.*?)\{\/red\}/g, '<span data-color="red">$1</span>');
-  // 将 {blue}...{/blue} 转换为 <span data-color="blue">...</span>
-  processed = processed.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span data-color="blue">$1</span>');
+  // 将 {red}...{/red} 转换为带样式的 span
+  let processed = content.replace(/\{red\}(.*?)\{\/red\}/g, '<span class="bg-red-50 text-red-700 px-2 py-1 rounded-md border border-red-200 font-medium">$1</span>');
+  // 将 {blue}...{/blue} 转换为带样式的 span
+  processed = processed.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-200 font-medium">$1</span>');
   return processed;
 };
 
@@ -165,6 +166,7 @@ ${result.detailedFeedback}
           <CardContent className="p-4 sm:p-6 lg:p-8">
             <ReactMarkdown
               className="prose prose-slate max-w-none w-full text-left"
+              rehypePlugins={[rehypeRaw]}
               components={{
                 // 自定义组件样式
                 h1: ({ children, ...props }) => (
@@ -203,24 +205,8 @@ ${result.detailedFeedback}
                   <p className="my-3 text-gray-800 leading-relaxed text-sm sm:text-base text-left break-words" {...props}>
                     {children}
                   </p>
-                ),
-                // 处理包含颜色标记的内容
-                span: ({ children, ...props }) => {
-                  // 检查是否有 data-color 属性
-                  if (props['data-color'] === 'red') {
-                    return <span className="bg-red-50 text-red-700 px-2 py-1 rounded-md border border-red-200 font-medium" {...props}>{children}</span>;
-                  }
-                  if (props['data-color'] === 'blue') {
-                    return <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-200 font-medium" {...props}>{children}</span>;
-                  }
-                  return <span {...props}>{children}</span>;
-                }
+                )
               }}
-              // 允许 HTML 标签以支持我们的自定义 span 标记
-              rehypePlugins={[]}
-              remarkPlugins={[]}
-              // 允许 HTML
-              allowedTags={['h1', 'h2', 'h3', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'span', 'br']}
             >
               {processedContent}
             </ReactMarkdown>
