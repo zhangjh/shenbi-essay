@@ -1,12 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RefreshCw, Download, Maximize } from 'lucide-react';
+
 import React, { useState } from 'react';
-import { Progress } from "@/components/ui/progress"
-import { CheckCircle, AlertCircle } from 'lucide-react';
-import { Badge } from "@/components/ui/badge"
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
+import ImageFullscreenPreview from './ImageFullscreenPreview';
+import ImagePreviewCard from './ImagePreviewCard';
+import MarkdownResult from './MarkdownResult';
+import StructuredResult from './StructuredResult';
+import ActionButtons from './ActionButtons';
 
 interface GradingResultProps {
   result: {
@@ -24,43 +22,6 @@ interface GradingResultProps {
   onNewGrading: () => void;
   imageUrl?: string;
 }
-
-// 全屏图片预览遮罩组件
-const ImageFullscreenPreview = ({
-  src,
-  alt,
-  show,
-  onClose,
-}: {
-  src: string;
-  alt?: string;
-  show: boolean;
-  onClose: () => void;
-}) => {
-  if (!show) return null;
-  return (
-    <div
-      className="fixed inset-0 z-[120] bg-black/80 flex items-center justify-center transition animate-fade-in"
-      onClick={onClose}
-      style={{ cursor: 'zoom-out' }}
-    >
-      <img
-        src={src}
-        alt={alt}
-        className="max-w-full max-h-full rounded-lg shadow-2xl border-4 border-white"
-        onClick={e => e.stopPropagation()}
-        style={{ objectFit: 'contain' }}
-      />
-      <button
-        className="absolute top-6 right-8 text-white bg-black/60 rounded-full p-3 hover:bg-black/90 transition"
-        onClick={onClose}
-        aria-label="关闭预览"
-      >
-        <svg width={26} height={26} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m18 6-6-6m0 0-6-6m6 6 6 6m-6-6-6 6"/></svg>
-      </button>
-    </div>
-  );
-};
 
 const GradingResult = ({ result, onNewGrading, imageUrl }: GradingResultProps) => {
   // 控制图片全屏预览
@@ -107,33 +68,10 @@ ${result.detailedFeedback}
         {/* 图片预览区，仅有图片时显示 */}
         {imageUrl && (
           <>
-            <div className="flex justify-center mb-6 sm:mb-8">
-              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 w-full max-w-sm sm:max-w-md">
-                <div
-                  tabIndex={0}
-                  title="点击可放大/全屏查看"
-                  className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 w-full aspect-[4/3] group cursor-zoom-in transition hover:scale-[1.02] hover:shadow-xl"
-                  style={{ outline: 'none' }}
-                  onClick={() => setShowPreview(true)}
-                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setShowPreview(true)}
-                >
-                  <img
-                    src={imageUrl}
-                    alt="上传的作文预览"
-                    className="object-contain w-full h-full transition"
-                    draggable={false}
-                  />
-                  {/* 放大icon */}
-                  <div className="absolute right-2 sm:right-3 bottom-2 sm:bottom-3 bg-white/90 rounded-full p-1.5 sm:p-2 shadow-lg group-hover:bg-white group-hover:scale-110 transition-all">
-                    <Maximize className="w-4 h-4 sm:w-5 sm:h-5 text-sky-700" />
-                  </div>
-                  {/* 蒙版 */}
-                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/40 via-white/10 to-transparent" />
-                </div>
-                <div className="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-3 text-center font-medium">上传图片预览（点击可放大全屏）</div>
-              </div>
-            </div>
-            {/* 全屏预览遮罩 */}
+            <ImagePreviewCard 
+              imageUrl={imageUrl} 
+              onImageClick={() => setShowPreview(true)} 
+            />
             <ImageFullscreenPreview
               src={imageUrl}
               alt={'上传的作文图片大图'}
@@ -143,89 +81,14 @@ ${result.detailedFeedback}
           </>
         )}
 
-        {/* 使用 ReactMarkdown 渲染内容 */}
-        <Card className="shadow-xl border-blue-100 bg-white w-full">
-          <CardHeader className="pb-3 sm:pb-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-t-lg px-4 sm:px-6 py-4 sm:py-6">
-            <CardTitle className="text-xl sm:text-2xl text-center gradient-text flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-green-500 flex-shrink-0" />
-              <span>智能批改结果</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6 lg:p-8">
-            <ReactMarkdown
-              className="prose prose-slate max-w-none w-full text-left"
-              rehypePlugins={[rehypeRaw]}
-              components={{
-                // 自定义组件样式
-                h1: ({ children, ...props }) => (
-                  <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 mt-6 sm:mt-8 text-slate-900 border-b-2 border-slate-200 pb-3 text-left break-words" {...props}>
-                    {children}
-                  </h1>
-                ),
-                h2: ({ children, ...props }) => (
-                  <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 mt-6 sm:mt-8 text-blue-800 border-b-2 border-blue-100 pb-2 text-left break-words" {...props}>
-                    <span className="inline-block w-1 h-5 sm:h-6 bg-blue-500 mr-2 sm:mr-3 rounded-full align-middle"></span>
-                    {children}
-                  </h2>
-                ),
-                h3: ({ children, ...props }) => (
-                  <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 mt-4 sm:mt-6 text-blue-700 text-left break-words" {...props}>
-                    <span className="inline-block w-2 h-2 bg-blue-400 mr-2 rounded-full align-middle"></span>
-                    {children}
-                  </h3>
-                ),
-                strong: ({ children, ...props }) => (
-                  <strong className="font-semibold text-blue-800 bg-blue-50 px-1 py-0.5 rounded text-sm sm:text-base break-words" {...props}>
-                    {children}
-                  </strong>
-                ),
-                ul: ({ children, ...props }) => (
-                  <ul className="list-none pl-0 mb-4 sm:mb-6 space-y-2 bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-100" {...props}>
-                    {children}
-                  </ul>
-                ),
-                li: ({ children, ...props }) => (
-                  <li className="text-gray-700 text-sm sm:text-base leading-relaxed mb-2 pl-4 text-left break-words border-l-3 border-transparent hover:border-blue-200 transition-colors" {...props}>
-                    {children}
-                  </li>
-                ),
-                p: ({ children, ...props }) => (
-                  <p className="my-3 text-gray-800 leading-relaxed text-sm sm:text-base text-left break-words" {...props}>
-                    {children}
-                  </p>
-                )
-              }}
-            >
-              {result.markdownContent}
-            </ReactMarkdown>
-          </CardContent>
-        </Card>
+        {/* Markdown 结果显示 */}
+        <MarkdownResult markdownContent={result.markdownContent} />
 
         {/* 操作按钮 */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 pb-6 sm:pb-8">
-          <Button variant="outline" onClick={exportResult} className="shadow-md hover:shadow-lg transition-shadow w-full sm:w-auto">
-            <Download className="w-4 h-4 mr-2" />
-            导出报告
-          </Button>
-          <Button onClick={onNewGrading} className="gradient-bg text-white shadow-md hover:shadow-lg transition-shadow w-full sm:w-auto">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            批改新作文
-          </Button>
-        </div>
+        <ActionButtons onExport={exportResult} onNewGrading={onNewGrading} />
       </div>
     );
   }
-
-  // ... keep existing code (旧的结构化结果渲染逻辑)
-  const percentage = result.score && result.totalScore ? (result.score / result.totalScore) * 100 : 0;
-  
-  const getGradeColor = (grade?: string) => {
-    if (!grade) return 'bg-gray-500';
-    if (grade.startsWith('A')) return 'bg-green-500';
-    if (grade.startsWith('B')) return 'bg-blue-500';
-    if (grade.startsWith('C')) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
@@ -250,14 +113,15 @@ ${result.detailedFeedback}
               />
               {/* 放大icon */}
               <div className="absolute right-3 bottom-3 bg-white/80 rounded-full p-2 shadow group-hover:bg-white group-hover:scale-110 transition-all">
-                <Maximize className="w-5 h-5 text-sky-700" />
+                <svg className="w-5 h-5 text-sky-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M9 18a9 9 0 1 1 9-9"/>
+                </svg>
               </div>
               {/* 蒙版 */}
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/60 via-white/20 to-transparent" />
             </div>
             <div className="text-xs text-gray-400 mt-1">上传图片预览（点击可放大全屏）</div>
           </div>
-          {/* 全屏预览遮罩 */}
           <ImageFullscreenPreview
             src={imageUrl}
             alt={'上传的作文图片大图'}
@@ -267,87 +131,19 @@ ${result.detailedFeedback}
         </>
       )}
 
-      {/* Score Overview */}
-      <Card className="shadow-lg">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className={`w-20 h-20 rounded-full ${getGradeColor(result.grade)} flex items-center justify-center text-white text-2xl font-bold`}>
-              {result.grade}
-            </div>
-          </div>
-          <CardTitle className="text-2xl">
-            {result.score} / {result.totalScore} 分
-          </CardTitle>
-          <Progress value={percentage} className="w-full mt-4" />
-          <p className="text-gray-600 mt-2">总体评分：{percentage.toFixed(1)}%</p>
-        </CardHeader>
-      </Card>
+      {/* 结构化结果显示 */}
+      <StructuredResult
+        score={result.score}
+        totalScore={result.totalScore}
+        grade={result.grade}
+        strengths={result.strengths}
+        improvements={result.improvements}
+        detailedFeedback={result.detailedFeedback}
+      />
 
-      {/* Strengths and Improvements */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-green-600">
-              <CheckCircle className="w-5 h-5 mr-2" />
-              优点亮点
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {result.strengths?.map((strength, index) => (
-                <li key={index} className="flex items-start">
-                  <Badge variant="secondary" className="bg-green-100 text-green-700 mr-2 mt-0.5">
-                    {index + 1}
-                  </Badge>
-                  <span className="text-gray-700">{strength}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-orange-600">
-              <AlertCircle className="w-5 h-5 mr-2" />
-              改进建议
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {result.improvements?.map((improvement, index) => (
-                <li key={index} className="flex items-start">
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-700 mr-2 mt-0.5">
-                    {index + 1}
-                  </Badge>
-                  <span className="text-gray-700">{improvement}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Detailed Feedback */}
-      <Card>
-        <CardHeader>
-          <CardTitle>详细评语</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-700 leading-relaxed">{result.detailedFeedback}</p>
-        </CardContent>
-      </Card>
-
-      {/* Action Buttons */}
+      {/* 操作按钮 */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button variant="outline" onClick={exportResult}>
-          <Download className="w-4 h-4 mr-2" />
-          导出报告
-        </Button>
-        <Button onClick={onNewGrading} className="gradient-bg text-white">
-          <RefreshCw className="w-4 h-4 mr-2" />
-          批改新作文
-        </Button>
+        <ActionButtons onExport={exportResult} onNewGrading={onNewGrading} />
       </div>
     </div>
   );
