@@ -12,8 +12,10 @@ import {
   CheckCircle, 
   Star,
   ArrowLeft,
-  Loader2
+  Loader2,
+  LogOut
 } from 'lucide-react';
+import AdminLogin from '@/components/admin/AdminLogin';
 import TopicGenerator from '@/components/admin/TopicGenerator';
 import EssayGenerator from '@/components/admin/EssayGenerator';
 import TopicReview from '@/components/admin/TopicReview';
@@ -23,6 +25,20 @@ import FeaturedTopics from '@/components/admin/FeaturedTopics';
 const Admin = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('generator');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+  };
+
+  // 如果未登录，显示登录页面
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={handleLogin} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -42,9 +58,19 @@ const Admin = () => {
               <div className="h-6 w-px bg-gray-300" />
               <h1 className="text-2xl font-bold text-gray-900">后台管理</h1>
             </div>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700">
-              管理员模式
-            </Badge>
+            <div className="flex items-center space-x-4">
+              <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                管理员模式
+              </Badge>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="flex items-center space-x-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>退出登录</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
