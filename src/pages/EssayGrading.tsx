@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import imageCompression from 'browser-image-compression';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import CameraCapture from '@/components/CameraCapture';
