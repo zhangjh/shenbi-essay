@@ -6,6 +6,7 @@ import HeroSection from '@/components/HeroSection';
 import GradeSelector from '@/components/GradeSelector';
 import EssayTopics from '@/components/EssayTopics';
 import FeatureCard from '@/components/FeatureCard';
+import SEO from '@/components/SEO';
 import { BookOpen, Search, Users, Upload, Edit } from 'lucide-react';
 
 const Index = () => {
@@ -37,111 +38,120 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
-      <Header />
+    <>
+      <SEO 
+        title="神笔作文 - 中小学生作文学习平台 | 智能批改 题目解析 写作指导"
+        description="神笔作文是专为中小学生打造的作文学习平台，提供智能批改、题目解析、范文学习、个性化指导等功能。涵盖小学、初中、高中各年级，助力学生提升写作水平。"
+        keywords="作文学习,作文批改,作文题目,小学作文,初中作文,高中作文,智能批改,写作指导,作文范文,记叙文,议论文,说明文"
+        canonical={window.location.href}
+      />
       
-      <HeroSection />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
+        <Header />
+        
+        <HeroSection />
 
-      {/* Main Features Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">核心功能</h2>
-            <p className="text-gray-600 text-lg">全方位的作文学习支持，让写作更轻松</p>
+        {/* Main Features Section */}
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">核心功能</h2>
+              <p className="text-gray-600 text-lg">全方位的作文学习支持，让写作更轻松</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {mainFeatures.map((feature, index) => (
+                <FeatureCard key={index} {...feature} />
+              ))}
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {mainFeatures.map((feature, index) => (
-              <FeatureCard key={index} {...feature} />
-            ))}
+        </section>
+
+        {/* Grade Selection Section */}
+        <section className="py-16 bg-white/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">选择年级段</h2>
+              <p className="text-gray-600 text-lg">不同年级，不同要求，个性化学习更有效</p>
+            </div>
+            
+            <GradeSelector 
+              selectedGrade={selectedGrade} 
+              onGradeChange={setSelectedGrade} 
+            />
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Grade Selection Section */}
-      <section className="py-16 bg-white/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">选择年级段</h2>
-            <p className="text-gray-600 text-lg">不同年级，不同要求，个性化学习更有效</p>
+        {/* Essay Topics Section */}
+        <section className="py-20 bg-white/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <EssayTopics selectedGrade={selectedGrade} />
           </div>
-          
-          <GradeSelector 
-            selectedGrade={selectedGrade} 
-            onGradeChange={setSelectedGrade} 
-          />
-        </div>
-      </section>
+        </section>
 
-      {/* Essay Topics Section */}
-      <section className="py-20 bg-white/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <EssayTopics selectedGrade={selectedGrade} />
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Desktop: 4 columns, Mobile: 2 columns */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {/* Logo and description - spans 2 columns on mobile */}
-            <div className="col-span-2 lg:col-span-1">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white">
-                  <img src="/assets/logo.png" alt="Logo" className="w-6 h-6" />
+        {/* Footer */}
+        <footer className="bg-gray-800 text-white py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Desktop: 4 columns, Mobile: 2 columns */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+              {/* Logo and description - spans 2 columns on mobile */}
+              <div className="col-span-2 lg:col-span-1">
+                <div className="flex items-center space-x-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white">
+                    <img src="/assets/logo.png" alt="Logo" className="w-6 h-6" />
+                  </div>
+                  <span className="text-lg font-bold">神笔作文</span>
                 </div>
-                <span className="text-lg font-bold">神笔作文</span>
+                <p className="text-gray-400 text-sm">让每个学生都能写出优秀的作文</p>
               </div>
-              <p className="text-gray-400 text-sm">让每个学生都能写出优秀的作文</p>
+              
+              {/* Features column */}
+              <div className="col-span-1">
+                <h4 className="font-semibold mb-4 text-sm">功能特色</h4>
+                <ul className="space-y-2 text-gray-400 text-sm">
+                  <li>题目解析</li>
+                  <li>范文学习</li>
+                  <li>智能批改</li>
+                  <li>个性指导</li>
+                </ul>
+              </div>
+              
+              {/* Grade coverage column */}
+              <div className="col-span-1">
+                <h4 className="font-semibold mb-4 text-sm">年级覆盖</h4>
+                <ul className="space-y-2 text-gray-400 text-sm">
+                  <li>小学作文</li>
+                  <li>初中作文</li>
+                  <li>高中作文</li>
+                  <li>专项训练</li>
+                </ul>
+              </div>
+              
+              {/* Contact info - spans 2 columns on mobile */}
+              <div className="col-span-2 lg:col-span-1">
+                <h4 className="font-semibold mb-4 text-sm">联系我们</h4>
+                <ul className="space-y-2 text-gray-400 text-sm">
+                  <li className="break-words">邮箱：zhangjh_initial@126.com</li>
+                  <li>
+                    <button 
+                      onClick={() => navigate('/admin')}
+                      className="text-gray-400 hover:text-white transition-colors underline"
+                    >
+                      管理入口
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
             
-            {/* Features column */}
-            <div className="col-span-1">
-              <h4 className="font-semibold mb-4 text-sm">功能特色</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li>题目解析</li>
-                <li>范文学习</li>
-                <li>智能批改</li>
-                <li>个性指导</li>
-              </ul>
-            </div>
-            
-            {/* Grade coverage column */}
-            <div className="col-span-1">
-              <h4 className="font-semibold mb-4 text-sm">年级覆盖</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li>小学作文</li>
-                <li>初中作文</li>
-                <li>高中作文</li>
-                <li>专项训练</li>
-              </ul>
-            </div>
-            
-            {/* Contact info - spans 2 columns on mobile */}
-            <div className="col-span-2 lg:col-span-1">
-              <h4 className="font-semibold mb-4 text-sm">联系我们</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li className="break-words">邮箱：zhangjh_initial@126.com</li>
-                <li>
-                  <button 
-                    onClick={() => navigate('/admin')}
-                    className="text-gray-400 hover:text-white transition-colors underline"
-                  >
-                    管理入口
-                  </button>
-                </li>
-              </ul>
+            {/* Copyright */}
+            <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+              <p className="text-sm">&copy; 2025 神笔作文. 保留所有权利.</p>
             </div>
           </div>
-          
-          {/* Copyright */}
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p className="text-sm">&copy; 2025 神笔作文. 保留所有权利.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
+    </>
   );
 };
 

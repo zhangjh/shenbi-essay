@@ -1,3 +1,4 @@
+
 User-agent: Googlebot
 Allow: /
 
@@ -12,3 +13,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://shenbi-essay.lovable.app/sitemap.xml
+
+# Disallow admin pages
+Disallow: /admin
