@@ -12,6 +12,7 @@ interface CameraCaptureProps {
 const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -19,7 +20,10 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
   useEffect(() => {
     // 检测是否为移动设备
     const checkMobile = () => {
-      setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+      const userAgent = navigator.userAgent;
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      setIsMobile(isMobileDevice);
+      console.log('Is mobile device:', isMobileDevice);
     };
     
     checkMobile();
@@ -27,41 +31,89 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
 
   const startCamera = async () => {
     try {
+      setError(null);
+      console.log('Starting camera for mobile:', isMobile);
+      
+      // 移动端优先使用后置摄像头，桌面端使用前置摄像头
       const constraints = {
         video: {
           facingMode: isMobile ? { ideal: 'environment' } : 'user',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
+          width: { 
+            min: 320,
+            ideal: isMobile ? 1280 : 1920,
+            max: 1920 
+          },
+          height: { 
+            min: 240,
+            ideal: isMobile ? 720 : 1080,
+            max: 1080 
+          }
+        },
+        audio: false
       };
+
+      console.log('Camera constraints:', constraints);
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        // 确保视频能够播放
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play().catch(err => {
+              console.error('Error playing video:', err);
+              setError('无法播放摄像头画面');
+            });
+          }
+        };
       }
       
       setIsStreaming(true);
+      console.log('Camera started successfully');
     } catch (error) {
       console.error('Error accessing camera:', error);
-      alert('无法访问摄像头，请检查权限设置');
+      let errorMessage = '无法访问摄像头';
+      
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage = '摄像头权限被拒绝，请在浏览器设置中允许访问摄像头';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = '未找到摄像头设备';
+        } else if (error.name === 'NotSupportedError') {
+          errorMessage = '浏览器不支持摄像头功能';
+        } else if (error.name === 'OverconstrainedError') {
+          errorMessage = '摄像头不支持所需的分辨率';
+        }
+      }
+      
+      setError(errorMessage);
     }
   };
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log('Camera track stopped:', track.kind);
+      });
       streamRef.current = null;
     }
     setIsStreaming(false);
+    setError(null);
   };
 
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const video = videoRef.current;
+      
+      // 确保视频有内容
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        setError('摄像头画面未准备好，请稍后再试');
+        return;
+      }
       
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -72,6 +124,7 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
         const imageData = canvas.toDataURL('image/jpeg', 0.8);
         onImageCapture(imageData);
         stopCamera();
+        console.log('Photo captured successfully');
       }
     }
   };
@@ -82,43 +135,54 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {!capturedImage ? (
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-4 lg:p-6">
             {!isStreaming ? (
-              <div className="text-center py-12">
-                <Camera className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              <div className="text-center py-6 sm:py-8 lg:py-12">
+                <Camera className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">
                   使用摄像头拍照
                 </h3>
-                <p className="text-gray-500 mb-6">
-                  {isMobile ? '点击下方按钮开启摄像头' : '需要摄像头权限来拍摄作文'}
+                <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 px-2">
+                  {isMobile ? '点击下方按钮开启摄像头拍照' : '需要摄像头权限来拍摄作文'}
                 </p>
-                <Button onClick={startCamera} className="gradient-bg text-white">
-                  <Camera className="w-4 h-4 mr-2" />
+                {error && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
+                <Button onClick={startCamera} className="gradient-bg text-white text-sm sm:text-base">
+                  <Camera className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   开启摄像头
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="relative bg-black rounded-lg overflow-hidden">
                   <video
                     ref={videoRef}
-                    className="w-full h-64 md:h-96 object-cover"
+                    className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover"
                     autoPlay
                     playsInline
                     muted
+                    style={{ transform: isMobile ? 'scaleX(-1)' : 'none' }}
                   />
+                  {error && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
+                      <p className="text-white text-sm text-center px-4">{error}</p>
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-center space-x-4">
-                  <Button variant="outline" onClick={stopCamera}>
-                    <X className="w-4 h-4 mr-2" />
-                    取消
+                <div className="flex justify-center space-x-3 sm:space-x-4">
+                  <Button variant="outline" onClick={stopCamera} size="sm">
+                    <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="text-xs sm:text-sm">取消</span>
                   </Button>
-                  <Button onClick={capturePhoto} className="gradient-bg text-white">
-                    <Camera className="w-4 h-4 mr-2" />
-                    拍照
+                  <Button onClick={capturePhoto} className="gradient-bg text-white" size="sm">
+                    <Camera className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="text-xs sm:text-sm">拍照</span>
                   </Button>
                 </div>
               </div>
@@ -127,23 +191,23 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
         </Card>
       ) : (
         <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-6">
-            <div className="space-y-4">
+          <CardContent className="p-3 sm:p-4 lg:p-6">
+            <div className="space-y-3 sm:space-y-4">
               <div className="relative bg-black rounded-lg overflow-hidden">
                 <img 
                   src={capturedImage} 
                   alt="Captured" 
-                  className="w-full h-64 md:h-96 object-cover"
+                  className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover"
                 />
               </div>
-              <div className="flex justify-center space-x-4">
-                <Button variant="outline" onClick={retakePhoto}>
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  重新拍照
+              <div className="flex justify-center space-x-3 sm:space-x-4">
+                <Button variant="outline" onClick={retakePhoto} size="sm">
+                  <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm">重新拍照</span>
                 </Button>
-                <Button className="gradient-bg text-white">
-                  <Check className="w-4 h-4 mr-2" />
-                  确认使用
+                <Button className="gradient-bg text-white" size="sm">
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm">确认使用</span>
                 </Button>
               </div>
             </div>

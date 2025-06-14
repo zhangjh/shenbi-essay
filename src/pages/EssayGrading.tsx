@@ -156,31 +156,31 @@ const EssayGrading = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
       <Header />
       
-      <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Header */}
-        <div className="flex items-center mb-4 sm:mb-6 lg:mb-8">
+        <div className="flex items-center mb-4 sm:mb-6">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/')}
-            className="mr-2 sm:mr-4 p-1 sm:p-2"
+            className="mr-2 sm:mr-3 p-1 sm:p-2"
             size="sm"
           >
-            <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            <span className="text-xs sm:text-sm">返回首页</span>
+            <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="text-sm">返回首页</span>
           </Button>
-          <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">智能作文批改</h1>
-            <p className="text-gray-600 mt-1 sm:mt-2 text-xs sm:text-sm lg:text-base">上传您的作文，获得专业的AI批改建议</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg sm:text-2xl font-bold text-gray-800 truncate">智能作文批改</h1>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">上传您的作文，获得专业的AI批改建议</p>
           </div>
         </div>
 
         {/* Main Content */}
         {!gradingResult ? (
           <Card className="shadow-lg">
-            <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 py-3 sm:py-6">
-              <CardTitle className="flex items-center text-base sm:text-lg lg:text-xl">
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                上传作文
+            <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 py-3 sm:py-4">
+              <CardTitle className="flex items-center text-base sm:text-lg">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                <span>上传作文</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
@@ -192,7 +192,7 @@ const EssayGrading = () => {
               ) : uploadMode === 'file' ? (
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between mb-3 sm:mb-4">
-                    <h3 className="text-base sm:text-lg font-semibold">文件上传</h3>
+                    <h3 className="text-sm sm:text-base font-semibold">文件上传</h3>
                     <Button variant="outline" size="sm" onClick={handleReselect} className="text-xs sm:text-sm">
                       重新选择
                     </Button>
@@ -205,7 +205,7 @@ const EssayGrading = () => {
               ) : (
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between mb-3 sm:mb-4">
-                    <h3 className="text-base sm:text-lg font-semibold">拍照上传</h3>
+                    <h3 className="text-sm sm:text-base font-semibold">拍照上传</h3>
                     <Button variant="outline" size="sm" onClick={handleReselect} className="text-xs sm:text-sm">
                       重新选择
                     </Button>
@@ -218,20 +218,20 @@ const EssayGrading = () => {
               )}
 
               {/* Action Buttons */}
-              <div className="flex justify-between mt-6 sm:mt-8 gap-2 sm:gap-4">
+              <div className="flex flex-col sm:flex-row justify-between mt-4 sm:mt-6 gap-3 sm:gap-4">
                 <Button 
                   variant="outline" 
                   onClick={handleReset}
                   disabled={!uploadedFile && !capturedImage}
                   size="sm"
-                  className="text-xs sm:text-sm"
+                  className="text-xs sm:text-sm w-full sm:w-auto order-2 sm:order-1"
                 >
                   重新选择
                 </Button>
                 <Button 
                   onClick={handleStartGrading}
                   disabled={(!uploadedFile && !capturedImage) || isAnalyzing}
-                  className="gradient-bg text-white text-xs sm:text-sm"
+                  className="gradient-bg text-white text-xs sm:text-sm w-full sm:w-auto order-1 sm:order-2"
                   size="sm"
                 >
                   {isAnalyzing ? '正在批改中...' : '开始智能批改'}
@@ -267,20 +267,19 @@ const UploadModeSelector = ({
   isMobile: boolean;
 }) => {
   return (
-    <div className="text-center py-6 sm:py-8 lg:py-12">
-      <FileText className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 text-gray-400 mx-auto mb-3 sm:mb-4 lg:mb-6" />
-      <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-700 mb-2 sm:mb-3 lg:mb-4">
+    <div className="text-center py-6 sm:py-8">
+      <FileText className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4 sm:mb-6" />
+      <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2 sm:mb-4">
         选择上传方式
       </h3>
-      <p className="text-xs sm:text-sm lg:text-base text-gray-500 mb-4 sm:mb-6 lg:mb-8 px-2 sm:px-4">
+      <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 px-4">
         请选择您希望使用的上传方式
       </p>
       
-      <div className="flex flex-col gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-sm lg:max-w-md mx-auto px-2 sm:px-4">
+      <div className="flex flex-col gap-3 max-w-xs mx-auto">
         <Button 
           onClick={() => onSelectMode('file')}
-          className="gradient-bg text-white w-full py-2 sm:py-3 text-sm sm:text-base"
-          size="sm"
+          className="gradient-bg text-white w-full py-3 text-sm sm:text-base"
         >
           文件上传
         </Button>
@@ -288,8 +287,7 @@ const UploadModeSelector = ({
           <Button 
             onClick={() => onSelectMode('camera')}
             variant="outline"
-            className="w-full py-2 sm:py-3 text-sm sm:text-base"
-            size="sm"
+            className="w-full py-3 text-sm sm:text-base"
           >
             拍照上传
           </Button>
