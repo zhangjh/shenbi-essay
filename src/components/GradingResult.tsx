@@ -1,50 +1,51 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { CheckCircle, AlertCircle, RefreshCw, Download } from 'lucide-react';
+import { RefreshCw, Download } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface GradingResultProps {
   result: {
-    score: number;
-    totalScore: number;
-    grade: string;
-    strengths: string[];
-    improvements: string[];
-    detailedFeedback: string;
+    // 新的 markdown 格式结果
+    markdownContent?: string;
+    isMarkdown?: boolean;
+    // 旧的结构化结果（向后兼容）
+    score?: number;
+    totalScore?: number;
+    grade?: string;
+    strengths?: string[];
+    improvements?: string[];
+    detailedFeedback?: string;
   };
   onNewGrading: () => void;
 }
 
 const GradingResult = ({ result, onNewGrading }: GradingResultProps) => {
-  const percentage = (result.score / result.totalScore) * 100;
-  
-  const getGradeColor = (grade: string) => {
-    if (grade.startsWith('A')) return 'bg-green-500';
-    if (grade.startsWith('B')) return 'bg-blue-500';
-    if (grade.startsWith('C')) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
-
   const exportResult = () => {
-    const content = `
+    let content = '';
+    
+    if (result.isMarkdown && result.markdownContent) {
+      content = result.markdownContent;
+    } else {
+      // 向后兼容旧格式
+      content = `
 作文批改报告
 =============
 
 总分：${result.score}/${result.totalScore} (${result.grade})
 
 优点：
-${result.strengths.map(item => `• ${item}`).join('\n')}
+${result.strengths?.map(item => `• ${item}`).join('\n')}
 
 改进建议：
-${result.improvements.map(item => `• ${item}`).join('\n')}
+${result.improvements?.map(item => `• ${item}`).join('\n')}
 
 详细评语：
 ${result.detailedFeedback}
 
 生成时间：${new Date().toLocaleString()}
-    `;
+      `;
+    }
     
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -55,6 +56,69 @@ ${result.detailedFeedback}
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  // 如果是 markdown 格式，使用新的渲染方式
+  if (result.isMarkdown && result.markdownContent) {
+    return (
+      <div className="space-y-6">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">智能批改结果</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-slate max-w-none">
+              <ReactMarkdown
+                className="markdown-content"
+                components={{
+                  h1: ({ children }) => <h1 className="text-2xl font-bold mb-4 text-gray-800">{children}</h1>,
+                  h2: ({ children }) => <h2 className="text-xl font-semibold mb-3 text-gray-700 mt-6">{children}</h2>,
+                  h3: ({ children }) => <h3 className="text-lg font-medium mb-2 text-gray-600 mt-4">{children}</h3>,
+                  p: ({ children }) => <p className="mb-3 text-gray-700 leading-relaxed">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
+                  li: ({ children }) => <li className="text-gray-700">{children}</li>,
+                  strong: ({ children }) => <strong className="font-semibold text-gray-800">{children}</strong>,
+                  blockquote: ({ children }) => (
+                    <blockquote className="border-l-4 border-blue-500 pl-4 italic bg-blue-50 py-2 my-4">
+                      {children}
+                    </blockquote>
+                  ),
+                  code: ({ children }) => (
+                    <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{children}</code>
+                  ),
+                }}
+              >
+                {result.markdownContent}
+              </ReactMarkdown>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button variant="outline" onClick={exportResult}>
+            <Download className="w-4 h-4 mr-2" />
+            导出报告
+          </Button>
+          <Button onClick={onNewGrading} className="gradient-bg text-white">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            批改新作文
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // 向后兼容：使用旧的结构化显示方式
+  const percentage = result.score && result.totalScore ? (result.score / result.totalScore) * 100 : 0;
+  
+  const getGradeColor = (grade?: string) => {
+    if (!grade) return 'bg-gray-500';
+    if (grade.startsWith('A')) return 'bg-green-500';
+    if (grade.startsWith('B')) return 'bg-blue-500';
+    if (grade.startsWith('C')) return 'bg-yellow-500';
+    return 'bg-red-500';
   };
 
   return (

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from '@/components/ui/use-toast';
 
 const EssayGrading = () => {
   const navigate = useNavigate();
@@ -33,32 +34,94 @@ const EssayGrading = () => {
     console.log('Image captured');
   };
 
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // 移除 data:image/jpeg;base64, 前缀，只保留 base64 数据
+        const base64Data = result.split(',')[1];
+        resolve(base64Data);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const extractTextFromFile = async (file: File): Promise<string> => {
+    if (file.type === 'text/plain') {
+      return await file.text();
+    }
+    // 对于图片和PDF，返回空字符串，使用fileImg参数
+    return '';
+  };
+
   const handleStartGrading = async () => {
     if (!uploadedFile && !capturedImage) return;
     
     setIsAnalyzing(true);
     
-    // 模拟AI批改过程
-    setTimeout(() => {
-      const mockResult = {
-        score: 85,
-        totalScore: 100,
-        strengths: [
-          '文章结构清晰，层次分明',
-          '语言表达流畅，用词准确',
-          '内容丰富，有一定的思想深度'
-        ],
-        improvements: [
-          '开头可以更加吸引人',
-          '段落之间的过渡可以更自然',
-          '结尾部分可以进一步升华主题'
-        ],
-        detailedFeedback: '这是一篇较为优秀的作文。文章整体结构合理，内容充实，表达清楚。在语言运用方面表现良好，但在创新性和深度方面还有提升空间。建议多加练习，注重细节的完善。',
-        grade: 'B+'
+    try {
+      let requestData: any = {
+        title: '作文批改',
+        desc: '智能作文批改',
+        level: 12,
+        weight: 100
       };
-      setGradingResult(mockResult);
+
+      if (uploadedFile) {
+        if (uploadedFile.type === 'text/plain') {
+          // 文本文件，提取内容作为essay参数
+          const essayContent = await extractTextFromFile(uploadedFile);
+          requestData.essay = essayContent;
+        } else {
+          // 图片或PDF文件，转换为base64作为fileImg参数
+          const base64Data = await convertFileToBase64(uploadedFile);
+          requestData.fileImg = base64Data;
+        }
+      } else if (capturedImage) {
+        // 拍照的图片，移除data:image/jpeg;base64,前缀
+        const base64Data = capturedImage.split(',')[1];
+        requestData.fileImg = base64Data;
+      }
+
+      console.log('Sending grading request:', requestData);
+
+      const response = await fetch('https://tx.zhangjh.cn/shenbi/essay/grading', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.text(); // 返回的是markdown格式的文本
+      console.log('Grading result:', result);
+      
+      setGradingResult({
+        markdownContent: result,
+        isMarkdown: true
+      });
+      
+      toast({
+        title: "批改完成",
+        description: "作文批改已完成，请查看详细结果。",
+      });
+
+    } catch (error) {
+      console.error('Grading error:', error);
+      toast({
+        title: "批改失败",
+        description: "批改过程中出现错误，请重试。",
+        variant: "destructive",
+      });
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   const handleReset = () => {
