@@ -1,4 +1,5 @@
 
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -20,4 +21,17 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: [
+      'markmap-lib',
+      'markmap-view',
+      'markmap-common'
+    ]
+  },
+  build: {
+    rollupOptions: {
+      external: [],
+    }
+  }
 }));
+

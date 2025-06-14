@@ -48,6 +48,7 @@
     "embla-carousel-react": "^8.3.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.462.0",
+    "markmap-common": "^0.18.9",
     "markmap-lib": "^0.18.11",
     "markmap-view": "^0.18.10",
     "next-themes": "^0.3.0",
