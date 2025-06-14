@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Download, Maximize } from 'lucide-react';
@@ -100,9 +101,9 @@ ${result.detailedFeedback}
 
   const processMarkdownContent = (content: string) => {
     return content
-      // 处理红色标记（错误）- 移动端优化，确保文本对齐
-      .replace(/<span style=['"]color:red['"]>(.*?)<\/span>/g, '<span class="inline-block bg-red-50 text-red-800 px-2 py-1 my-1 rounded-md border border-red-200 font-medium text-sm break-words align-baseline">$1</span>')
-      .replace(/【(.*?)】/g, '<span class="inline-block bg-red-100 text-red-800 px-3 py-2 my-1 rounded-lg border-2 border-red-300 font-semibold text-sm break-words align-baseline">【$1】</span>')
+      // 处理红色标记（错误）- 只保留红色，去掉包裹效果
+      .replace(/<span style=['"]color:red['"]>(.*?)<\/span>/g, '<span class="text-red-600">$1</span>')
+      .replace(/【(.*?)】/g, '<span class="text-red-600 font-medium">【$1】</span>')
       // 处理蓝色标记（建议）- 移动端优化，确保文本对齐
       .replace(/<span style=['"]color:blue['"]>(.*?)<\/span>/g, '<span class="inline-block bg-blue-50 text-blue-800 px-2 py-1 my-1 rounded-md border border-blue-200 font-medium text-sm break-words align-baseline">$1</span>')
       // 处理标题 - 移动端响应式，优化对齐
