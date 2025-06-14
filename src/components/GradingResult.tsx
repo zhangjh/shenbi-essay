@@ -1,9 +1,9 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Download, Maximize } from 'lucide-react';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkHtml from 'remark-html';
 import { Progress } from "@/components/ui/progress"
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { Badge } from "@/components/ui/badge"
@@ -143,64 +143,28 @@ ${result.detailedFeedback}
           </>
         )}
 
-        {/* 渲染 markdown 内容，分块样式优化 */}
+        {/* 渲染 markdown 内容，支持HTML标签 */}
         <Card className="shadow-xl border-blue-100 p-0">
           <CardHeader className="pb-2">
             <CardTitle className="text-2xl text-center gradient-text">智能批改结果</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-slate max-w-none prose-img:rounded-lg prose-img:shadow prose-p:leading-relaxed">
-              <ReactMarkdown
-                className="markdown-content"
-                components={{
-                  h1: ({ children }) => (
-                    <h1 className="text-2xl font-bold mb-4 mt-8 text-sky-900 border-b pb-2">{children}</h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className="text-xl font-semibold mb-3 mt-8 text-blue-700 border-b border-blue-100 pb-1">{children}</h2>
-                  ),
-                  h3: ({ children }) => (
-                    <h3 className="text-lg font-medium mb-2 mt-6 text-blue-600">{children}</h3>
-                  ),
-                  p: ({ children }) => (
-                    <p className="my-2 text-gray-800 leading-relaxed">{children}</p>
-                  ),
-                  ul: ({ children }) => (
-                    <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>
-                  ),
-                  ol: ({ children }) => (
-                    <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>
-                  ),
-                  li: ({ children }) => (
-                    <li className="text-gray-700 leading-6">{children}</li>
-                  ),
-                  strong: ({ children }) => (
-                    <strong className="font-semibold text-blue-800">{children}</strong>
-                  ),
-                  blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-blue-400 pl-5 italic bg-blue-50 py-2 my-4 rounded">{children}</blockquote>
-                  ),
-                  code: ({ children }) => (
-                    <code className="bg-gray-200 px-2 py-1 rounded text-sm font-mono">{children}</code>
-                  ),
-                  img: ({ src, alt }) =>
-                    <img src={src ?? ''} alt={alt} className="mx-auto rounded shadow max-h-64" />,
-                  // 新增span标签处理，识别style颜色
-                  span: ({ node, ...props }) => {
-                    // @ts-ignore-next-line
-                    const style = props.style as React.CSSProperties | undefined;
-                    let tw = "";
-                    if (style && typeof style === "object") {
-                      if (style.color === "red") tw = "text-red-600 font-semibold";
-                      if (style.color === "blue") tw = "text-blue-600 font-semibold";
-                    }
-                    return <span className={tw}>{props.children}</span>;
-                  },
-                }}
-              >
-                {result.markdownContent}
-              </ReactMarkdown>
-            </div>
+            <div 
+              className="prose prose-slate max-w-none prose-img:rounded-lg prose-img:shadow prose-p:leading-relaxed"
+              dangerouslySetInnerHTML={{
+                __html: result.markdownContent
+                  .replace(/<span style=['"]color:red['"]>/g, '<span class="text-red-600 font-semibold bg-red-50 px-1 rounded">')
+                  .replace(/<span style=['"]color:blue['"]>/g, '<span class="text-blue-600 font-semibold bg-blue-50 px-1 rounded">')
+                  .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-blue-800">$1</strong>')
+                  .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold mb-3 mt-8 text-blue-700 border-b border-blue-100 pb-1">$1</h2>')
+                  .replace(/^### (.*$)/gim, '<h3 class="text-lg font-medium mb-2 mt-6 text-blue-600">$1</h3>')
+                  .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mb-4 mt-8 text-sky-900 border-b pb-2">$1</h1>')
+                  .replace(/^\* (.*$)/gim, '<li class="text-gray-700 leading-6 mb-1">$1</li>')
+                  .replace(/^\d+\. (.*$)/gim, '<li class="text-gray-700 leading-6 mb-1">$1</li>')
+                  .replace(/^([^#*\d\n<].*$)/gim, '<p class="my-2 text-gray-800 leading-relaxed">$1</p>')
+                  .replace(/(<li[^>]*>.*<\/li>)/gs, '<ul class="list-disc pl-6 mb-4 space-y-1">$1</ul>')
+              }}
+            />
           </CardContent>
         </Card>
 
@@ -356,4 +320,3 @@ ${result.detailedFeedback}
 };
 
 export default GradingResult;
-
