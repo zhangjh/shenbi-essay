@@ -7,25 +7,29 @@ import CameraCapture from '@/components/CameraCapture';
 import GradingResult from '@/components/GradingResult';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Camera, ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const EssayGrading = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [gradingResult, setGradingResult] = useState<any>(null);
+  const [uploadMode, setUploadMode] = useState<'file' | 'camera' | null>(null);
 
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
     setCapturedImage(null);
+    setUploadMode('file');
     console.log('File uploaded:', file.name);
   };
 
   const handleImageCapture = (imageData: string) => {
     setCapturedImage(imageData);
     setUploadedFile(null);
+    setUploadMode('camera');
     console.log('Image captured');
   };
 
@@ -62,6 +66,11 @@ const EssayGrading = () => {
     setCapturedImage(null);
     setGradingResult(null);
     setIsAnalyzing(false);
+    setUploadMode(null);
+  };
+
+  const handleSelectUploadMode = (mode: 'file' | 'camera') => {
+    setUploadMode(mode);
   };
 
   return (
@@ -95,32 +104,22 @@ const EssayGrading = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="upload" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="upload" className="flex items-center">
-                    <Upload className="w-4 h-4 mr-2" />
-                    文件上传
-                  </TabsTrigger>
-                  <TabsTrigger value="camera" className="flex items-center">
-                    <Camera className="w-4 h-4 mr-2" />
-                    拍照上传
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="upload" className="mt-6">
-                  <FileUpload 
-                    onFileSelect={handleFileUpload}
-                    selectedFile={uploadedFile}
-                  />
-                </TabsContent>
-
-                <TabsContent value="camera" className="mt-6">
-                  <CameraCapture 
-                    onImageCapture={handleImageCapture}
-                    capturedImage={capturedImage}
-                  />
-                </TabsContent>
-              </Tabs>
+              {uploadMode === null ? (
+                <UploadModeSelector 
+                  onSelectMode={handleSelectUploadMode}
+                  isMobile={isMobile}
+                />
+              ) : uploadMode === 'file' ? (
+                <FileUpload 
+                  onFileSelect={handleFileUpload}
+                  selectedFile={uploadedFile}
+                />
+              ) : (
+                <CameraCapture 
+                  onImageCapture={handleImageCapture}
+                  capturedImage={capturedImage}
+                />
+              )}
 
               {/* Action Buttons */}
               <div className="flex justify-between mt-8">
@@ -146,6 +145,45 @@ const EssayGrading = () => {
             result={gradingResult}
             onNewGrading={handleReset}
           />
+        )}
+      </div>
+    </div>
+  );
+};
+
+// 上传方式选择组件
+const UploadModeSelector = ({ 
+  onSelectMode, 
+  isMobile 
+}: { 
+  onSelectMode: (mode: 'file' | 'camera') => void;
+  isMobile: boolean;
+}) => {
+  return (
+    <div className="text-center py-12">
+      <FileText className="w-16 h-16 text-gray-400 mx-auto mb-6" />
+      <h3 className="text-xl font-semibold text-gray-700 mb-4">
+        选择上传方式
+      </h3>
+      <p className="text-gray-500 mb-8">
+        请选择您希望使用的上传方式
+      </p>
+      
+      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+        <Button 
+          onClick={() => onSelectMode('file')}
+          className="gradient-bg text-white flex-1"
+        >
+          文件上传
+        </Button>
+        {isMobile && (
+          <Button 
+            onClick={() => onSelectMode('camera')}
+            variant="outline"
+            className="flex-1"
+          >
+            拍照上传
+          </Button>
         )}
       </div>
     </div>
