@@ -123,7 +123,14 @@ const Index = () => {
               <h4 className="font-semibold mb-4 text-sm">联系我们</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li className="break-words">邮箱：zhangjh_initial@126.com</li>
-                {/* <li>QQ群：123456789</li> */}
+                <li>
+                  <button 
+                    onClick={() => navigate('/admin')}
+                    className="text-gray-400 hover:text-white transition-colors underline"
+                  >
+                    管理入口
+                  </button>
+                </li>
               </ul>
             </div>
           </div>
