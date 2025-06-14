@@ -1,4 +1,5 @@
 
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Download, Maximize } from 'lucide-react';
@@ -101,6 +102,10 @@ ${result.detailedFeedback}
 
   const processMarkdownContent = (content: string) => {
     return content
+      // 首先处理粗体 - 优先处理避免与其他规则冲突
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-blue-800 bg-blue-50 px-1 py-0.5 rounded text-sm sm:text-base break-words">$1</strong>')
+      // 处理单个星号的加粗（列表项前的星号）
+      .replace(/^\* /gm, '')
       // 处理红色标记（错误）- 只保留红色，去掉包裹效果
       .replace(/<span style=['"]color:red['"]>(.*?)<\/span>/g, '<span class="text-red-600">$1</span>')
       .replace(/【(.*?)】/g, '<span class="text-red-600 font-medium">【$1】</span>')
@@ -110,13 +115,15 @@ ${result.detailedFeedback}
       .replace(/^## (.*$)/gim, '<h2 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 mt-6 sm:mt-8 text-blue-800 border-b-2 border-blue-100 pb-2 text-left break-words"><span class="inline-block w-1 h-5 sm:h-6 bg-blue-500 mr-2 sm:mr-3 rounded-full align-middle"></span>$1</h2>')
       .replace(/^### (.*$)/gim, '<h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3 mt-4 sm:mt-6 text-blue-700 text-left break-words"><span class="inline-block w-2 h-2 bg-blue-400 mr-2 rounded-full align-middle"></span>$1</h3>')
       .replace(/^# (.*$)/gim, '<h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 mt-6 sm:mt-8 text-slate-900 border-b-2 border-slate-200 pb-3 text-left break-words">$1</h1>')
-      // 处理列表项 - 移动端优化，确保对齐
-      .replace(/^\* (.*$)/gim, '<li class="text-gray-700 text-sm sm:text-base leading-relaxed mb-2 pl-4 text-left break-words border-l-3 border-transparent hover:border-blue-200 transition-colors">$1</li>')
-      .replace(/^\d+\. (.*$)/gim, '<li class="text-gray-700 text-sm sm:text-base leading-relaxed mb-2 pl-4 text-left break-words border-l-3 border-transparent hover:border-blue-200 transition-colors">$1</li>')
-      // 处理段落 - 移动端优化，确保文本对齐
-      .replace(/^([^#*\d\n<].*$)/gim, '<p class="my-3 text-gray-800 leading-relaxed text-sm sm:text-base text-left break-words">$1</p>')
-      // 处理粗体 - 移动端优化，确保对齐
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-blue-800 bg-blue-50 px-1 py-0.5 rounded text-sm sm:text-base break-words">$1</strong>')
+      // 处理列表项 - 移动端优化，确保对齐（现在星号已经被移除）
+      .replace(/^([^#\d\n<].*$)/gim, (match, p1) => {
+        // 如果是以数字开头的，作为有序列表处理
+        if (/^\d+\. /.test(p1)) {
+          return `<li class="text-gray-700 text-sm sm:text-base leading-relaxed mb-2 pl-4 text-left break-words border-l-3 border-transparent hover:border-blue-200 transition-colors">${p1.replace(/^\d+\. /, '')}</li>`;
+        }
+        // 其他作为段落处理
+        return `<p class="my-3 text-gray-800 leading-relaxed text-sm sm:text-base text-left break-words">${p1}</p>`;
+      })
       // 包装列表 - 移动端优化，确保列表对齐
       .replace(/(<li[^>]*>.*?<\/li>)/gs, '<ul class="list-none pl-0 mb-4 sm:mb-6 space-y-2 bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-100">$1</ul>');
   };
@@ -340,3 +347,4 @@ ${result.detailedFeedback}
 };
 
 export default GradingResult;
+
