@@ -100,39 +100,39 @@ ${result.detailedFeedback}
 
   const processMarkdownContent = (content: string) => {
     return content
-      // 处理红色标记（错误）
-      .replace(/<span style=['"]color:red['"]>(.*?)<\/span>/g, '<span class="inline-block bg-red-50 text-red-700 px-2 py-1 rounded-md border border-red-200 font-medium shadow-sm">$1</span>')
-      .replace(/【(.*?)】/g, '<span class="inline-block bg-red-50 text-red-700 px-2 py-1 rounded-md border border-red-200 font-medium shadow-sm mx-1">【$1】</span>')
-      // 处理蓝色标记（建议）
-      .replace(/<span style=['"]color:blue['"]>(.*?)<\/span>/g, '<span class="inline-block bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-200 font-medium shadow-sm">$1</span>')
-      // 处理标题
-      .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mb-4 mt-8 text-blue-800 border-b-2 border-blue-100 pb-2 flex items-center"><span class="w-1 h-6 bg-blue-500 mr-3 rounded-full"></span>$1</h2>')
-      .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mb-3 mt-6 text-blue-700 flex items-center"><span class="w-2 h-2 bg-blue-400 mr-2 rounded-full"></span>$1</h3>')
-      .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mb-6 mt-8 text-slate-900 border-b-2 border-slate-200 pb-3">$1</h1>')
-      // 处理列表项
-      .replace(/^\* (.*$)/gim, '<li class="text-gray-700 leading-7 mb-2 pl-2 border-l-2 border-transparent hover:border-blue-200 transition-colors">$1</li>')
-      .replace(/^\d+\. (.*$)/gim, '<li class="text-gray-700 leading-7 mb-2 pl-2 border-l-2 border-transparent hover:border-blue-200 transition-colors">$1</li>')
-      // 处理段落
-      .replace(/^([^#*\d\n<].*$)/gim, '<p class="my-3 text-gray-800 leading-7 text-base">$1</p>')
-      // 处理粗体
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-blue-800 bg-blue-50 px-1 rounded">$1</strong>')
-      // 包装列表
-      .replace(/(<li[^>]*>.*?<\/li>)/gs, '<ul class="list-none pl-0 mb-6 space-y-2 bg-gray-50 rounded-lg p-4 border border-gray-100">$1</ul>');
+      // 处理红色标记（错误）- 移动端优化
+      .replace(/<span style=['"]color:red['"]>(.*?)<\/span>/g, '<span class="inline-block bg-red-50 text-red-800 px-2 py-1 mx-0.5 my-0.5 rounded-lg border border-red-200 font-medium shadow-sm text-sm leading-relaxed break-words">$1</span>')
+      .replace(/【(.*?)】/g, '<span class="inline-block bg-red-100 text-red-800 px-3 py-2 mx-1 my-1 rounded-xl border-2 border-red-300 font-semibold shadow-md text-sm md:text-base leading-relaxed max-w-full break-words">【$1】</span>')
+      // 处理蓝色标记（建议）- 移动端优化
+      .replace(/<span style=['"]color:blue['"]>(.*?)<\/span>/g, '<span class="inline-block bg-blue-50 text-blue-800 px-2 py-1 mx-0.5 my-0.5 rounded-lg border border-blue-200 font-medium shadow-sm text-sm leading-relaxed break-words">$1</span>')
+      // 处理标题 - 移动端响应式
+      .replace(/^## (.*$)/gim, '<h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4 mt-6 md:mt-8 text-blue-800 border-b-2 border-blue-100 pb-2 flex items-center flex-wrap"><span class="w-1 h-4 md:h-6 bg-blue-500 mr-2 md:mr-3 rounded-full flex-shrink-0"></span><span class="break-words">$1</span></h2>')
+      .replace(/^### (.*$)/gim, '<h3 class="text-base md:text-lg font-semibold mb-2 md:mb-3 mt-4 md:mt-6 text-blue-700 flex items-center flex-wrap"><span class="w-2 h-2 bg-blue-400 mr-2 rounded-full flex-shrink-0"></span><span class="break-words">$1</span></h3>')
+      .replace(/^# (.*$)/gim, '<h1 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 mt-6 md:mt-8 text-slate-900 border-b-2 border-slate-200 pb-3 break-words">$1</h1>')
+      // 处理列表项 - 移动端优化
+      .replace(/^\* (.*$)/gim, '<li class="text-gray-700 text-sm md:text-base leading-6 md:leading-7 mb-2 pl-3 md:pl-4 border-l-3 border-transparent hover:border-blue-200 transition-colors break-words">$1</li>')
+      .replace(/^\d+\. (.*$)/gim, '<li class="text-gray-700 text-sm md:text-base leading-6 md:leading-7 mb-2 pl-3 md:pl-4 border-l-3 border-transparent hover:border-blue-200 transition-colors break-words">$1</li>')
+      // 处理段落 - 移动端优化
+      .replace(/^([^#*\d\n<].*$)/gim, '<p class="my-2 md:my-3 text-gray-800 leading-6 md:leading-7 text-sm md:text-base break-words">$1</p>')
+      // 处理粗体 - 移动端优化
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-blue-800 bg-blue-50 px-1 py-0.5 rounded text-sm md:text-base break-words">$1</strong>')
+      // 包装列表 - 移动端优化
+      .replace(/(<li[^>]*>.*?<\/li>)/gs, '<ul class="list-none pl-0 mb-4 md:mb-6 space-y-2 bg-gray-50 rounded-lg p-3 md:p-4 border border-gray-100 overflow-hidden">$1</ul>');
   };
 
   // 判断是markdown批改结果
   if (result.isMarkdown && result.markdownContent) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         {/* 图片预览区，仅有图片时显示 */}
         {imageUrl && (
           <>
-            <div className="flex flex-col items-center mb-8">
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="flex flex-col items-center mb-6 md:mb-8">
+              <div className="bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-gray-100 w-full max-w-sm md:max-w-md">
                 <div
                   tabIndex={0}
                   title="点击可放大/全屏查看"
-                  className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 w-full max-w-md aspect-[4/3] group cursor-zoom-in transition hover:scale-[1.02] hover:shadow-xl"
+                  className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 w-full aspect-[4/3] group cursor-zoom-in transition hover:scale-[1.02] hover:shadow-xl"
                   style={{ outline: 'none' }}
                   onClick={() => setShowPreview(true)}
                   onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setShowPreview(true)}
@@ -141,17 +141,16 @@ ${result.detailedFeedback}
                     src={imageUrl}
                     alt="上传的作文预览"
                     className="object-contain w-full h-full transition"
-                    style={{ maxHeight: 360 }}
                     draggable={false}
                   />
                   {/* 放大icon */}
-                  <div className="absolute right-3 bottom-3 bg-white/90 rounded-full p-2 shadow-lg group-hover:bg-white group-hover:scale-110 transition-all">
-                    <Maximize className="w-5 h-5 text-sky-700" />
+                  <div className="absolute right-2 md:right-3 bottom-2 md:bottom-3 bg-white/90 rounded-full p-1.5 md:p-2 shadow-lg group-hover:bg-white group-hover:scale-110 transition-all">
+                    <Maximize className="w-4 h-4 md:w-5 md:h-5 text-sky-700" />
                   </div>
                   {/* 蒙版 */}
                   <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/40 via-white/10 to-transparent" />
                 </div>
-                <div className="text-sm text-gray-500 mt-3 text-center font-medium">上传图片预览（点击可放大全屏）</div>
+                <div className="text-xs md:text-sm text-gray-500 mt-2 md:mt-3 text-center font-medium">上传图片预览（点击可放大全屏）</div>
               </div>
             </div>
             {/* 全屏预览遮罩 */}
@@ -166,18 +165,18 @@ ${result.detailedFeedback}
 
         {/* 渲染 markdown 内容，优化布局和样式 */}
         <Card className="shadow-xl border-blue-100 bg-white">
-          <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-t-lg">
-            <CardTitle className="text-2xl text-center gradient-text flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 mr-3 text-green-500" />
-              智能批改结果
+          <CardHeader className="pb-3 md:pb-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-t-lg px-4 md:px-6 py-4 md:py-6">
+            <CardTitle className="text-xl md:text-2xl text-center gradient-text flex items-center justify-center flex-wrap">
+              <CheckCircle className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 text-green-500 flex-shrink-0" />
+              <span>智能批改结果</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-4 md:p-8">
             <div 
-              className="prose prose-slate max-w-none prose-img:rounded-lg prose-img:shadow-lg"
+              className="prose prose-slate max-w-none prose-img:rounded-lg prose-img:shadow-lg overflow-hidden"
               style={{ 
-                fontSize: '16px',
-                lineHeight: '1.7',
+                fontSize: '14px',
+                lineHeight: '1.6',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
               }}
               dangerouslySetInnerHTML={{
@@ -188,12 +187,12 @@ ${result.detailedFeedback}
         </Card>
 
         {/* 操作按钮 */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 pb-8">
-          <Button variant="outline" onClick={exportResult} className="shadow-md hover:shadow-lg transition-shadow">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mt-6 md:mt-8 pb-6 md:pb-8 px-4 md:px-0">
+          <Button variant="outline" onClick={exportResult} className="shadow-md hover:shadow-lg transition-shadow w-full sm:w-auto">
             <Download className="w-4 h-4 mr-2" />
             导出报告
           </Button>
-          <Button onClick={onNewGrading} className="gradient-bg text-white shadow-md hover:shadow-lg transition-shadow">
+          <Button onClick={onNewGrading} className="gradient-bg text-white shadow-md hover:shadow-lg transition-shadow w-full sm:w-auto">
             <RefreshCw className="w-4 h-4 mr-2" />
             批改新作文
           </Button>
