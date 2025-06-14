@@ -12,6 +12,15 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { 
   Star, 
   StarOff, 
@@ -28,16 +37,32 @@ const FeaturedTopics = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [gradeFilter, setGradeFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  
+  const pageSize = 50;
 
   useEffect(() => {
     loadTopics();
-  }, []);
+  }, [currentPage, searchQuery, gradeFilter, typeFilter]);
 
   const loadTopics = async () => {
     setLoading(true);
     try {
-      const result = await searchEssayTopics({ pageSize: 200 });
+      // 构建搜索参数
+      const searchParams = {
+        page: currentPage,
+        pageSize: pageSize,
+        query: searchQuery || undefined,
+        grade: gradeFilter !== 'all' ? gradeFilter : undefined,
+        type: typeFilter !== 'all' ? typeFilter : undefined,
+      };
+
+      const result = await searchEssayTopics(searchParams);
       setTopics(result.data);
+      setTotalItems(result.total || result.data.length);
+      setTotalPages(Math.ceil((result.total || result.data.length) / pageSize));
     } catch (error) {
       toast.error('加载题目失败');
     } finally {
@@ -60,14 +85,83 @@ const FeaturedTopics = () => {
     }
   };
 
-  const filteredTopics = topics.filter(topic => {
-    const matchesSearch = topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         topic.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesGrade = gradeFilter === 'all' || topic.grade === gradeFilter;
-    const matchesType = typeFilter === 'all' || topic.type === typeFilter;
+  const handleSearch = () => {
+    setCurrentPage(1);
+    loadTopics();
+  };
+
+  const handleFilterChange = () => {
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
     
-    return matchesSearch && matchesGrade && matchesType;
-  });
+    // 计算显示的页码范围
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // 添加第一页和省略号
+    if (startPage > 1) {
+      items.push(
+        <PaginationItem key="1">
+          <PaginationLink onClick={() => handlePageChange(1)} isActive={currentPage === 1}>
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      if (startPage > 2) {
+        items.push(
+          <PaginationItem key="ellipsis-start">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+
+    // 添加中间的页码
+    for (let page = startPage; page <= endPage; page++) {
+      items.push(
+        <PaginationItem key={page}>
+          <PaginationLink 
+            onClick={() => handlePageChange(page)} 
+            isActive={currentPage === page}
+          >
+            {page}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    // 添加省略号和最后一页
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        items.push(
+          <PaginationItem key="ellipsis-end">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      items.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink onClick={() => handlePageChange(totalPages)} isActive={currentPage === totalPages}>
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return items;
+  };
 
   const featuredCount = topics.filter(topic => topic.important).length;
 
@@ -78,14 +172,14 @@ const FeaturedTopics = () => {
   return (
     <div className="space-y-6">
       {/* 统计卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
               <Star className="w-5 h-5 text-yellow-500" />
               <div>
                 <p className="text-2xl font-bold">{featuredCount}</p>
-                <p className="text-sm text-gray-600">精选题目</p>
+                <p className="text-sm text-gray-600">本页精选</p>
               </div>
             </div>
           </CardContent>
@@ -95,7 +189,7 @@ const FeaturedTopics = () => {
             <div className="flex items-center space-x-2">
               <Search className="w-5 h-5 text-blue-500" />
               <div>
-                <p className="text-2xl font-bold">{topics.length}</p>
+                <p className="text-2xl font-bold">{totalItems}</p>
                 <p className="text-sm text-gray-600">总题目数</p>
               </div>
             </div>
@@ -106,8 +200,19 @@ const FeaturedTopics = () => {
             <div className="flex items-center space-x-2">
               <Filter className="w-5 h-5 text-green-500" />
               <div>
-                <p className="text-2xl font-bold">{filteredTopics.length}</p>
-                <p className="text-sm text-gray-600">筛选结果</p>
+                <p className="text-2xl font-bold">{topics.length}</p>
+                <p className="text-sm text-gray-600">当前页数量</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-5 h-5 bg-purple-500 rounded" />
+              <div>
+                <p className="text-2xl font-bold">{currentPage}/{totalPages}</p>
+                <p className="text-sm text-gray-600">当前页/总页数</p>
               </div>
             </div>
           </CardContent>
@@ -129,12 +234,16 @@ const FeaturedTopics = () => {
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="搜索题目..."
                 className="pl-10"
               />
             </div>
             
-            <Select value={gradeFilter} onValueChange={setGradeFilter}>
+            <Select value={gradeFilter} onValueChange={(value) => {
+              setGradeFilter(value);
+              handleFilterChange();
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="选择年级" />
               </SelectTrigger>
@@ -146,7 +255,10 @@ const FeaturedTopics = () => {
               </SelectContent>
             </Select>
 
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <Select value={typeFilter} onValueChange={(value) => {
+              setTypeFilter(value);
+              handleFilterChange();
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="选择类型" />
               </SelectTrigger>
@@ -167,6 +279,8 @@ const FeaturedTopics = () => {
                 setSearchQuery('');
                 setGradeFilter('all');
                 setTypeFilter('all');
+                setCurrentPage(1);
+                handleFilterChange();
               }}
             >
               清除筛选
@@ -187,7 +301,7 @@ const FeaturedTopics = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredTopics.map((topic) => (
+              {topics.map((topic) => (
                 <TableRow key={topic.id}>
                   <TableCell className="max-w-xs">
                     <div>
@@ -259,9 +373,33 @@ const FeaturedTopics = () => {
               ))}
             </TableBody>
           </Table>
-          {filteredTopics.length === 0 && (
+          
+          {topics.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               没有找到符合条件的题目
+            </div>
+          )}
+
+          {/* 分页组件 */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-6">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                      className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  {renderPaginationItems()}
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                      className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </CardContent>
