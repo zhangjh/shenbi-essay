@@ -2,8 +2,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Download, Maximize } from 'lucide-react';
 import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkHtml from 'remark-html';
 import { Progress } from "@/components/ui/progress"
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { Badge } from "@/components/ui/badge"
@@ -62,7 +60,6 @@ const ImageFullscreenPreview = ({
   );
 };
 
-
 const GradingResult = ({ result, onNewGrading, imageUrl }: GradingResultProps) => {
   // 控制图片全屏预览
   const [showPreview, setShowPreview] = useState(false);
@@ -101,6 +98,28 @@ ${result.detailedFeedback}
     URL.revokeObjectURL(url);
   };
 
+  const processMarkdownContent = (content: string) => {
+    return content
+      // 处理红色标记（错误）
+      .replace(/<span style=['"]color:red['"]>(.*?)<\/span>/g, '<span class="inline-block bg-red-50 text-red-700 px-2 py-1 rounded-md border border-red-200 font-medium shadow-sm">$1</span>')
+      .replace(/【(.*?)】/g, '<span class="inline-block bg-red-50 text-red-700 px-2 py-1 rounded-md border border-red-200 font-medium shadow-sm mx-1">【$1】</span>')
+      // 处理蓝色标记（建议）
+      .replace(/<span style=['"]color:blue['"]>(.*?)<\/span>/g, '<span class="inline-block bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-200 font-medium shadow-sm">$1</span>')
+      // 处理标题
+      .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mb-4 mt-8 text-blue-800 border-b-2 border-blue-100 pb-2 flex items-center"><span class="w-1 h-6 bg-blue-500 mr-3 rounded-full"></span>$1</h2>')
+      .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mb-3 mt-6 text-blue-700 flex items-center"><span class="w-2 h-2 bg-blue-400 mr-2 rounded-full"></span>$1</h3>')
+      .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mb-6 mt-8 text-slate-900 border-b-2 border-slate-200 pb-3">$1</h1>')
+      // 处理列表项
+      .replace(/^\* (.*$)/gim, '<li class="text-gray-700 leading-7 mb-2 pl-2 border-l-2 border-transparent hover:border-blue-200 transition-colors">$1</li>')
+      .replace(/^\d+\. (.*$)/gim, '<li class="text-gray-700 leading-7 mb-2 pl-2 border-l-2 border-transparent hover:border-blue-200 transition-colors">$1</li>')
+      // 处理段落
+      .replace(/^([^#*\d\n<].*$)/gim, '<p class="my-3 text-gray-800 leading-7 text-base">$1</p>')
+      // 处理粗体
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-blue-800 bg-blue-50 px-1 rounded">$1</strong>')
+      // 包装列表
+      .replace(/(<li[^>]*>.*?<\/li>)/gs, '<ul class="list-none pl-0 mb-6 space-y-2 bg-gray-50 rounded-lg p-4 border border-gray-100">$1</ul>');
+  };
+
   // 判断是markdown批改结果
   if (result.isMarkdown && result.markdownContent) {
     return (
@@ -108,30 +127,32 @@ ${result.detailedFeedback}
         {/* 图片预览区，仅有图片时显示 */}
         {imageUrl && (
           <>
-            <div className="flex flex-col items-center mb-6">
-              <div
-                tabIndex={0}
-                title="点击可放大/全屏查看"
-                className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 w-full max-w-md aspect-[4/3] group cursor-zoom-in transition hover:scale-[1.02] hover:shadow-xl"
-                style={{ outline: 'none' }}
-                onClick={() => setShowPreview(true)}
-                onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setShowPreview(true)}
-              >
-                <img
-                  src={imageUrl}
-                  alt="上传的作文预览"
-                  className="object-contain w-full h-full transition"
-                  style={{ maxHeight: 360 }}
-                  draggable={false}
-                />
-                {/* 放大icon */}
-                <div className="absolute right-3 bottom-3 bg-white/80 rounded-full p-2 shadow group-hover:bg-white group-hover:scale-110 transition-all">
-                  <Maximize className="w-5 h-5 text-sky-700" />
+            <div className="flex flex-col items-center mb-8">
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div
+                  tabIndex={0}
+                  title="点击可放大/全屏查看"
+                  className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 w-full max-w-md aspect-[4/3] group cursor-zoom-in transition hover:scale-[1.02] hover:shadow-xl"
+                  style={{ outline: 'none' }}
+                  onClick={() => setShowPreview(true)}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setShowPreview(true)}
+                >
+                  <img
+                    src={imageUrl}
+                    alt="上传的作文预览"
+                    className="object-contain w-full h-full transition"
+                    style={{ maxHeight: 360 }}
+                    draggable={false}
+                  />
+                  {/* 放大icon */}
+                  <div className="absolute right-3 bottom-3 bg-white/90 rounded-full p-2 shadow-lg group-hover:bg-white group-hover:scale-110 transition-all">
+                    <Maximize className="w-5 h-5 text-sky-700" />
+                  </div>
+                  {/* 蒙版 */}
+                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/40 via-white/10 to-transparent" />
                 </div>
-                {/* 蒙版 */}
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/60 via-white/20 to-transparent" />
+                <div className="text-sm text-gray-500 mt-3 text-center font-medium">上传图片预览（点击可放大全屏）</div>
               </div>
-              <div className="text-xs text-gray-400 mt-1">上传图片预览（点击可放大全屏）</div>
             </div>
             {/* 全屏预览遮罩 */}
             <ImageFullscreenPreview
@@ -143,38 +164,36 @@ ${result.detailedFeedback}
           </>
         )}
 
-        {/* 渲染 markdown 内容，支持HTML标签 */}
-        <Card className="shadow-xl border-blue-100 p-0">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl text-center gradient-text">智能批改结果</CardTitle>
+        {/* 渲染 markdown 内容，优化布局和样式 */}
+        <Card className="shadow-xl border-blue-100 bg-white">
+          <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-t-lg">
+            <CardTitle className="text-2xl text-center gradient-text flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 mr-3 text-green-500" />
+              智能批改结果
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-8">
             <div 
-              className="prose prose-slate max-w-none prose-img:rounded-lg prose-img:shadow prose-p:leading-relaxed"
+              className="prose prose-slate max-w-none prose-img:rounded-lg prose-img:shadow-lg"
+              style={{ 
+                fontSize: '16px',
+                lineHeight: '1.7',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+              }}
               dangerouslySetInnerHTML={{
-                __html: result.markdownContent
-                  .replace(/<span style=['"]color:red['"]>/g, '<span class="text-red-600 font-semibold bg-red-50 px-1 rounded">')
-                  .replace(/<span style=['"]color:blue['"]>/g, '<span class="text-blue-600 font-semibold bg-blue-50 px-1 rounded">')
-                  .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-blue-800">$1</strong>')
-                  .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold mb-3 mt-8 text-blue-700 border-b border-blue-100 pb-1">$1</h2>')
-                  .replace(/^### (.*$)/gim, '<h3 class="text-lg font-medium mb-2 mt-6 text-blue-600">$1</h3>')
-                  .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mb-4 mt-8 text-sky-900 border-b pb-2">$1</h1>')
-                  .replace(/^\* (.*$)/gim, '<li class="text-gray-700 leading-6 mb-1">$1</li>')
-                  .replace(/^\d+\. (.*$)/gim, '<li class="text-gray-700 leading-6 mb-1">$1</li>')
-                  .replace(/^([^#*\d\n<].*$)/gim, '<p class="my-2 text-gray-800 leading-relaxed">$1</p>')
-                  .replace(/(<li[^>]*>.*<\/li>)/gs, '<ul class="list-disc pl-6 mb-4 space-y-1">$1</ul>')
+                __html: processMarkdownContent(result.markdownContent)
               }}
             />
           </CardContent>
         </Card>
 
         {/* 操作按钮 */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
-          <Button variant="outline" onClick={exportResult}>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 pb-8">
+          <Button variant="outline" onClick={exportResult} className="shadow-md hover:shadow-lg transition-shadow">
             <Download className="w-4 h-4 mr-2" />
             导出报告
           </Button>
-          <Button onClick={onNewGrading} className="gradient-bg text-white">
+          <Button onClick={onNewGrading} className="gradient-bg text-white shadow-md hover:shadow-lg transition-shadow">
             <RefreshCw className="w-4 h-4 mr-2" />
             批改新作文
           </Button>
@@ -260,7 +279,7 @@ ${result.detailedFeedback}
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {result.strengths.map((strength, index) => (
+              {result.strengths?.map((strength, index) => (
                 <li key={index} className="flex items-start">
                   <Badge variant="secondary" className="bg-green-100 text-green-700 mr-2 mt-0.5">
                     {index + 1}
@@ -281,7 +300,7 @@ ${result.detailedFeedback}
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {result.improvements.map((improvement, index) => (
+              {result.improvements?.map((improvement, index) => (
                 <li key={index} className="flex items-start">
                   <Badge variant="secondary" className="bg-orange-100 text-orange-700 mr-2 mt-0.5">
                     {index + 1}
