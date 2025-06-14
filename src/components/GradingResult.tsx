@@ -64,7 +64,7 @@ ${result.detailedFeedback}
   // 判断是markdown批改结果
   if (result.isMarkdown && result.markdownContent) {
     return (
-      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6 sm:space-y-8">
+      <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 lg:px-6 space-y-4 sm:space-y-6 lg:space-y-8">
         {/* 图片预览区，仅有图片时显示 */}
         {imageUrl && (
           <>
@@ -91,7 +91,7 @@ ${result.detailedFeedback}
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 lg:px-6 space-y-4 sm:space-y-6">
       {/* 图片预览区，仅有图片上传时显示 */}
       {imageUrl && (
         <>
