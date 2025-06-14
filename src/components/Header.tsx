@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, User, Book, Menu } from 'lucide-react';
+import { Search, User, Menu } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
@@ -73,8 +73,8 @@ const Header = () => {
               className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
               onClick={handleLogoClick}
             >
-              <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
-                <Book className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                <img src="/assets/logo.png" alt="Logo" className="w-5 h-5" />
               </div>
               <div>
                 <h1 className="text-lg font-bold gradient-text">神笔作文</h1>
