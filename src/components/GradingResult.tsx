@@ -62,15 +62,6 @@ const ImageFullscreenPreview = ({
   );
 };
 
-// 预处理文本，将 {red} 和 {blue} 标记转换为 HTML 格式
-const preprocessColorTags = (content: string): string => {
-  // 将 {red}...{/red} 转换为带样式的 span
-  let processed = content.replace(/\{red\}(.*?)\{\/red\}/g, '<span class="bg-red-50 text-red-700 px-2 py-1 rounded-md border border-red-200 font-medium">$1</span>');
-  // 将 {blue}...{/blue} 转换为带样式的 span
-  processed = processed.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-200 font-medium">$1</span>');
-  return processed;
-};
-
 const GradingResult = ({ result, onNewGrading, imageUrl }: GradingResultProps) => {
   // 控制图片全屏预览
   const [showPreview, setShowPreview] = useState(false);
@@ -111,9 +102,6 @@ ${result.detailedFeedback}
 
   // 判断是markdown批改结果
   if (result.isMarkdown && result.markdownContent) {
-    // 预处理内容，转换颜色标记
-    const processedContent = preprocessColorTags(result.markdownContent);
-    
     return (
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6 sm:space-y-8">
         {/* 图片预览区，仅有图片时显示 */}
@@ -208,7 +196,7 @@ ${result.detailedFeedback}
                 )
               }}
             >
-              {processedContent}
+              {result.markdownContent}
             </ReactMarkdown>
           </CardContent>
         </Card>
@@ -228,6 +216,7 @@ ${result.detailedFeedback}
     );
   }
 
+  // ... keep existing code (旧的结构化结果渲染逻辑)
   const percentage = result.score && result.totalScore ? (result.score / result.totalScore) * 100 : 0;
   
   const getGradeColor = (grade?: string) => {
