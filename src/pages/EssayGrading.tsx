@@ -63,9 +63,9 @@ const EssayGrading = () => {
     
     try {
       let requestData: any = {
-        title: '作文批改',
-        desc: '智能作文批改',
-        level: 12,
+        title: '',
+        desc: '',
+        level: '',
         weight: 100
       };
 
@@ -99,7 +99,7 @@ const EssayGrading = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.text(); // 返回的是markdown格式的文本
+      const result = await response.text();
       console.log('Grading result:', result);
       
       setGradingResult({
