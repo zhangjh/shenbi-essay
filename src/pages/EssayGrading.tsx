@@ -73,6 +73,13 @@ const EssayGrading = () => {
     setUploadMode(mode);
   };
 
+  // 重新选择上传方式
+  const handleReselect = () => {
+    setUploadedFile(null);
+    setCapturedImage(null);
+    setUploadMode(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
       <Header />
@@ -110,15 +117,31 @@ const EssayGrading = () => {
                   isMobile={isMobile}
                 />
               ) : uploadMode === 'file' ? (
-                <FileUpload 
-                  onFileSelect={handleFileUpload}
-                  selectedFile={uploadedFile}
-                />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">文件上传</h3>
+                    <Button variant="outline" size="sm" onClick={handleReselect}>
+                      重新选择
+                    </Button>
+                  </div>
+                  <FileUpload 
+                    onFileSelect={handleFileUpload}
+                    selectedFile={uploadedFile}
+                  />
+                </div>
               ) : (
-                <CameraCapture 
-                  onImageCapture={handleImageCapture}
-                  capturedImage={capturedImage}
-                />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">拍照上传</h3>
+                    <Button variant="outline" size="sm" onClick={handleReselect}>
+                      重新选择
+                    </Button>
+                  </div>
+                  <CameraCapture 
+                    onImageCapture={handleImageCapture}
+                    capturedImage={capturedImage}
+                  />
+                </div>
               )}
 
               {/* Action Buttons */}
@@ -160,19 +183,20 @@ const UploadModeSelector = ({
   isMobile: boolean;
 }) => {
   return (
-    <div className="text-center py-12">
-      <FileText className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-      <h3 className="text-xl font-semibold text-gray-700 mb-4">
+    <div className="text-center py-8 sm:py-12">
+      <FileText className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4 sm:mb-6" />
+      <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3 sm:mb-4">
         选择上传方式
       </h3>
-      <p className="text-gray-500 mb-8">
+      <p className="text-sm sm:text-base text-gray-500 mb-6 sm:mb-8 px-4">
         请选择您希望使用的上传方式
       </p>
       
-      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+      <div className="flex flex-col gap-3 sm:gap-4 max-w-xs sm:max-w-md mx-auto px-4">
         <Button 
           onClick={() => onSelectMode('file')}
-          className="gradient-bg text-white flex-1"
+          className="gradient-bg text-white w-full py-3"
+          size="lg"
         >
           文件上传
         </Button>
@@ -180,7 +204,8 @@ const UploadModeSelector = ({
           <Button 
             onClick={() => onSelectMode('camera')}
             variant="outline"
-            className="flex-1"
+            className="w-full py-3"
+            size="lg"
           >
             拍照上传
           </Button>

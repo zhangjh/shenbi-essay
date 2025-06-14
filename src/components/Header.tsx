@@ -1,17 +1,22 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, User, Book, Menu } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogoClick = () => {
     navigate('/');
   };
+
+  // 判断是否在题目列表页显示搜索框
+  const shouldShowSearch = location.pathname === '/topics' || location.pathname === '/';
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
@@ -32,19 +37,21 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="flex-1 max-w-lg mx-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                type="text"
-                placeholder="搜索作文题目、关键词..."
-                className="pl-10 pr-4 w-full"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          {/* Search Bar - only show on relevant pages */}
+          {shouldShowSearch && (
+            <div className="flex-1 max-w-lg mx-8">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="搜索作文题目、关键词..."
+                  className="pl-10 pr-4 w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* User Actions */}
           <div className="flex items-center space-x-4">
@@ -71,7 +78,7 @@ const Header = () => {
               </div>
               <div>
                 <h1 className="text-lg font-bold gradient-text">神笔作文</h1>
-                <p className="text-xs text-gray-500">ShenBi Essay Assistant</p>
+                <p className="text-xs text-gray-500">ShenBi Essay</p>
               </div>
             </div>
             <Button 
@@ -83,7 +90,7 @@ const Header = () => {
             </Button>
           </div>
 
-          {/* Mobile menu - now positioned right after the header row */}
+          {/* Mobile menu */}
           {isMenuOpen && (
             <div className="border-t border-gray-200 py-4">
               <div className="flex flex-col space-y-2">
@@ -98,19 +105,21 @@ const Header = () => {
             </div>
           )}
 
-          {/* Search bar row - now always visible below menu */}
-          <div className="pb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                type="text"
-                placeholder="搜索作文题目..."
-                className="pl-10 pr-4 w-full"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          {/* Search bar row - only show on relevant pages */}
+          {shouldShowSearch && (
+            <div className="pb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="搜索作文题目..."
+                  className="pl-10 pr-4 w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </header>
