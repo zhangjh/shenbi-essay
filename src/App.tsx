@@ -7,6 +7,7 @@ import Index from '@/pages/Index';
 import TopicAnalysis from '@/pages/TopicAnalysis';
 import Writing from '@/pages/Writing';
 import TopicLibrary from '@/pages/TopicLibrary';
+import EssayGrading from '@/pages/EssayGrading';
 import NotFound from '@/pages/NotFound';
 import './App.css';
 
@@ -23,6 +24,7 @@ function App() {
             <Route path="/topics" element={<TopicLibrary />} />
             <Route path="/topic/:id" element={<TopicAnalysis />} />
             <Route path="/topic/:id/write" element={<Writing />} />
+            <Route path="/grading" element={<EssayGrading />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

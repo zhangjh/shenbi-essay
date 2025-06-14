@@ -21,18 +21,18 @@ const Index = () => {
       onButtonClick: () => navigate('/topics')
     },
     {
-      title: "上传题目",
-      description: "上传自己的作文题目，获得专业的分析指导和范文参考",
-      icon: <Upload className="w-8 h-8 text-white" />,
-      buttonText: "上传题目",
-      onButtonClick: () => console.log("Upload topic")
+      title: "智能批改",
+      description: "上传作文照片或文档，获得专业的AI批改意见和改进建议",
+      icon: <Edit className="w-8 h-8 text-white" />,
+      buttonText: "智能批改",
+      onButtonClick: () => navigate('/grading')
     },
     {
-      title: "作文批改",
-      description: "提交您的作文，获得详细的批改意见和改进建议",
-      icon: <Edit className="w-8 h-8 text-white" />,
-      buttonText: "提交作文",
-      onButtonClick: () => console.log("Submit essay")
+      title: "个性指导",
+      description: "根据年级和写作水平，提供个性化的写作指导和练习建议",
+      icon: <Users className="w-8 h-8 text-white" />,
+      buttonText: "获取指导",
+      onButtonClick: () => console.log("Get guidance")
     }
   ];
 

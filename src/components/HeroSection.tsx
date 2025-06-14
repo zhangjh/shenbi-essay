@@ -57,9 +57,9 @@ const HeroSection = () => {
             <Button 
               size="lg" 
               className="gradient-bg text-white px-8 py-6 text-lg rounded-full hover:shadow-xl transition-all duration-300"
-              onClick={() => navigate('/topics')}
+              onClick={() => navigate('/grading')}
             >
-              开始写作之旅
+              开始智能批改
             </Button>
             <Button 
               size="lg" 
