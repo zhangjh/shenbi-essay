@@ -2,19 +2,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://shenbi-essay.lovable.app/</loc>
+    <loc>https://shenbi.zhangjh.cn/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <lastmod>2025-01-16</lastmod>
   </url>
   <url>
-    <loc>https://shenbi-essay.lovable.app/topics</loc>
+    <loc>https://shenbi.zhangjh.cn/topics</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
     <lastmod>2025-01-16</lastmod>
   </url>
   <url>
-    <loc>https://shenbi-essay.lovable.app/grading</loc>
+    <loc>https://shenbi.zhangjh.cn/grading</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-01-16</lastmod>

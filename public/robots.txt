@@ -15,7 +15,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://shenbi-essay.lovable.app/sitemap.xml
+Sitemap: https://shenbi.zhangjh.cn/sitemap.xml
 
 # Disallow admin pages
 Disallow: /admin

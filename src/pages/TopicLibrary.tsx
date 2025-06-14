@@ -160,7 +160,7 @@ const TopicLibrary = () => {
         title={generateSEOTitle()}
         description={generateSEODescription()}
         keywords="作文题目,作文题库,小学作文,初中作文,高中作文,记叙文,议论文,说明文,写作练习,作文搜索"
-        canonical={`${window.location.origin}/topics${window.location.search}`}
+        canonical={`https://shenbi.zhangjh.cn/topics${window.location.search}`}
       />
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">

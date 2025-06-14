@@ -63,13 +63,13 @@ const SEO = ({
 
     // 设置 canonical URL
     if (canonical) {
-      let canonicalLink = document.querySelector('link[rel="canonical"]');
+      let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
       if (canonicalLink) {
-        canonicalLink.setAttribute('href', canonical);
+        canonicalLink.href = canonical;
       } else {
         canonicalLink = document.createElement('link');
-        canonicalLink.setAttribute('rel', 'canonical');
-        canonicalLink.setAttribute('href', canonical);
+        canonicalLink.rel = 'canonical';
+        canonicalLink.href = canonical;
         document.head.appendChild(canonicalLink);
       }
     }
@@ -84,8 +84,8 @@ const SEO = ({
       "@type": "EducationalOrganization",
       "name": "神笔作文",
       "description": description,
-      "url": window.location.origin,
-      "logo": `${window.location.origin}${ogImage}`,
+      "url": "https://shenbi.zhangjh.cn",
+      "logo": `https://shenbi.zhangjh.cn${ogImage}`,
       "contactPoint": {
         "@type": "ContactPoint",
         "email": "zhangjh_initial@126.com",
@@ -95,7 +95,7 @@ const SEO = ({
       "availableLanguage": "zh-CN"
     };
 
-    let scriptTag = document.querySelector('script[type="application/ld+json"]');
+    let scriptTag = document.querySelector('script[type="application/ld+json"]') as HTMLScriptElement;
     if (scriptTag) {
       scriptTag.textContent = JSON.stringify(structuredData);
     } else {
