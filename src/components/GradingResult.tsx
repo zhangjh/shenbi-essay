@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Download, Maximize } from 'lucide-react';
@@ -107,7 +108,7 @@ ${result.detailedFeedback}
         {/* 图片预览区，仅有图片时显示 */}
         {imageUrl && (
           <>
-            <div className="flex flex-col items-center mb-4">
+            <div className="flex flex-col items-center mb-6">
               <div
                 tabIndex={0}
                 title="点击可放大/全屏查看"
@@ -142,7 +143,8 @@ ${result.detailedFeedback}
           </>
         )}
 
-        <Card className="shadow-xl border-blue-100">
+        {/* 渲染 markdown 内容，分块样式优化 */}
+        <Card className="shadow-xl border-blue-100 p-0">
           <CardHeader className="pb-2">
             <CardTitle className="text-2xl text-center gradient-text">智能批改结果</CardTitle>
           </CardHeader>
@@ -151,14 +153,30 @@ ${result.detailedFeedback}
               <ReactMarkdown
                 className="markdown-content"
                 components={{
-                  h1: ({ children }) => <h1 className="text-2xl font-bold mb-4 text-sky-950">{children}</h1>,
-                  h2: ({ children }) => <h2 className="text-xl font-semibold mb-3 text-blue-700 mt-6">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-lg font-medium mb-2 text-blue-600 mt-4">{children}</h3>,
-                  p: ({ children }) => <p className="mb-3 text-gray-800 leading-relaxed">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
-                  li: ({ children }) => <li className="text-gray-700">{children}</li>,
-                  strong: ({ children }) => <strong className="font-semibold text-blue-800">{children}</strong>,
+                  h1: ({ children }) => (
+                    <h1 className="text-2xl font-bold mb-4 mt-8 text-sky-900 border-b pb-2">{children}</h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-xl font-semibold mb-3 mt-8 text-blue-700 border-b border-blue-100 pb-1">{children}</h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="text-lg font-medium mb-2 mt-6 text-blue-600">{children}</h3>
+                  ),
+                  p: ({ children }) => (
+                    <p className="my-2 text-gray-800 leading-relaxed">{children}</p>
+                  ),
+                  ul: ({ children }) => (
+                    <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>
+                  ),
+                  li: ({ children }) => (
+                    <li className="text-gray-700 leading-6">{children}</li>
+                  ),
+                  strong: ({ children }) => (
+                    <strong className="font-semibold text-blue-800">{children}</strong>
+                  ),
                   blockquote: ({ children }) => (
                     <blockquote className="border-l-4 border-blue-400 pl-5 italic bg-blue-50 py-2 my-4 rounded">{children}</blockquote>
                   ),
@@ -166,7 +184,18 @@ ${result.detailedFeedback}
                     <code className="bg-gray-200 px-2 py-1 rounded text-sm font-mono">{children}</code>
                   ),
                   img: ({ src, alt }) =>
-                    <img src={src ?? ''} alt={alt} className="mx-auto rounded shadow max-h-64" />
+                    <img src={src ?? ''} alt={alt} className="mx-auto rounded shadow max-h-64" />,
+                  // 新增span标签处理，识别style颜色
+                  span: ({ node, ...props }) => {
+                    // @ts-ignore-next-line
+                    const style = props.style as React.CSSProperties | undefined;
+                    let tw = "";
+                    if (style && typeof style === "object") {
+                      if (style.color === "red") tw = "text-red-600 font-semibold";
+                      if (style.color === "blue") tw = "text-blue-600 font-semibold";
+                    }
+                    return <span className={tw}>{props.children}</span>;
+                  },
                 }}
               >
                 {result.markdownContent}
@@ -176,7 +205,7 @@ ${result.detailedFeedback}
         </Card>
 
         {/* 操作按钮 */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
           <Button variant="outline" onClick={exportResult}>
             <Download className="w-4 h-4 mr-2" />
             导出报告
@@ -327,3 +356,4 @@ ${result.detailedFeedback}
 };
 
 export default GradingResult;
+
