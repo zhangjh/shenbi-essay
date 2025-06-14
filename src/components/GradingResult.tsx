@@ -1,5 +1,3 @@
-
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Download, Maximize } from 'lucide-react';
@@ -7,6 +5,7 @@ import React, { useState } from 'react';
 import { Progress } from "@/components/ui/progress"
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { Badge } from "@/components/ui/badge"
+import ReactMarkdown from 'react-markdown';
 
 interface GradingResultProps {
   result: {
@@ -100,34 +99,6 @@ ${result.detailedFeedback}
     URL.revokeObjectURL(url);
   };
 
-  const processMarkdownContent = (content: string) => {
-    return content
-      // 首先处理粗体 - 优先处理避免与其他规则冲突
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-blue-800 bg-blue-50 px-1 py-0.5 rounded text-sm sm:text-base break-words">$1</strong>')
-      // 处理单个星号的加粗（列表项前的星号）
-      .replace(/^\* /gm, '')
-      // 处理红色标记（错误）- 只保留红色，去掉包裹效果
-      .replace(/<span style=['"]color:red['"]>(.*?)<\/span>/g, '<span class="text-red-600">$1</span>')
-      .replace(/【(.*?)】/g, '<span class="text-red-600 font-medium">【$1】</span>')
-      // 处理蓝色标记（建议）- 移动端优化，确保文本对齐
-      .replace(/<span style=['"]color:blue['"]>(.*?)<\/span>/g, '<span class="inline-block bg-blue-50 text-blue-800 px-2 py-1 my-1 rounded-md border border-blue-200 font-medium text-sm break-words align-baseline">$1</span>')
-      // 处理标题 - 移动端响应式，优化对齐
-      .replace(/^## (.*$)/gim, '<h2 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 mt-6 sm:mt-8 text-blue-800 border-b-2 border-blue-100 pb-2 text-left break-words"><span class="inline-block w-1 h-5 sm:h-6 bg-blue-500 mr-2 sm:mr-3 rounded-full align-middle"></span>$1</h2>')
-      .replace(/^### (.*$)/gim, '<h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3 mt-4 sm:mt-6 text-blue-700 text-left break-words"><span class="inline-block w-2 h-2 bg-blue-400 mr-2 rounded-full align-middle"></span>$1</h3>')
-      .replace(/^# (.*$)/gim, '<h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 mt-6 sm:mt-8 text-slate-900 border-b-2 border-slate-200 pb-3 text-left break-words">$1</h1>')
-      // 处理列表项 - 移动端优化，确保对齐（现在星号已经被移除）
-      .replace(/^([^#\d\n<].*$)/gim, (match, p1) => {
-        // 如果是以数字开头的，作为有序列表处理
-        if (/^\d+\. /.test(p1)) {
-          return `<li class="text-gray-700 text-sm sm:text-base leading-relaxed mb-2 pl-4 text-left break-words border-l-3 border-transparent hover:border-blue-200 transition-colors">${p1.replace(/^\d+\. /, '')}</li>`;
-        }
-        // 其他作为段落处理
-        return `<p class="my-3 text-gray-800 leading-relaxed text-sm sm:text-base text-left break-words">${p1}</p>`;
-      })
-      // 包装列表 - 移动端优化，确保列表对齐
-      .replace(/(<li[^>]*>.*?<\/li>)/gs, '<ul class="list-none pl-0 mb-4 sm:mb-6 space-y-2 bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-100">$1</ul>');
-  };
-
   // 判断是markdown批改结果
   if (result.isMarkdown && result.markdownContent) {
     return (
@@ -171,7 +142,7 @@ ${result.detailedFeedback}
           </>
         )}
 
-        {/* 渲染 markdown 内容，优化布局和样式 */}
+        {/* 使用 ReactMarkdown 渲染内容 */}
         <Card className="shadow-xl border-blue-100 bg-white w-full">
           <CardHeader className="pb-3 sm:pb-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-t-lg px-4 sm:px-6 py-4 sm:py-6">
             <CardTitle className="text-xl sm:text-2xl text-center gradient-text flex items-center justify-center">
@@ -180,18 +151,61 @@ ${result.detailedFeedback}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 lg:p-8">
-            <div 
+            <ReactMarkdown
               className="prose prose-slate max-w-none w-full text-left"
-              style={{ 
-                fontSize: '14px',
-                lineHeight: '1.6',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                textAlign: 'left'
+              components={{
+                // 自定义组件样式
+                h1: ({ children, ...props }) => (
+                  <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 mt-6 sm:mt-8 text-slate-900 border-b-2 border-slate-200 pb-3 text-left break-words" {...props}>
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children, ...props }) => (
+                  <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 mt-6 sm:mt-8 text-blue-800 border-b-2 border-blue-100 pb-2 text-left break-words" {...props}>
+                    <span className="inline-block w-1 h-5 sm:h-6 bg-blue-500 mr-2 sm:mr-3 rounded-full align-middle"></span>
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children, ...props }) => (
+                  <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 mt-4 sm:mt-6 text-blue-700 text-left break-words" {...props}>
+                    <span className="inline-block w-2 h-2 bg-blue-400 mr-2 rounded-full align-middle"></span>
+                    {children}
+                  </h3>
+                ),
+                strong: ({ children, ...props }) => (
+                  <strong className="font-semibold text-blue-800 bg-blue-50 px-1 py-0.5 rounded text-sm sm:text-base break-words" {...props}>
+                    {children}
+                  </strong>
+                ),
+                ul: ({ children, ...props }) => (
+                  <ul className="list-none pl-0 mb-4 sm:mb-6 space-y-2 bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-100" {...props}>
+                    {children}
+                  </ul>
+                ),
+                li: ({ children, ...props }) => (
+                  <li className="text-gray-700 text-sm sm:text-base leading-relaxed mb-2 pl-4 text-left break-words border-l-3 border-transparent hover:border-blue-200 transition-colors" {...props}>
+                    {children}
+                  </li>
+                ),
+                p: ({ children, ...props }) => (
+                  <p className="my-3 text-gray-800 leading-relaxed text-sm sm:text-base text-left break-words" {...props}>
+                    {children}
+                  </p>
+                ),
+                // 处理包含红色标记的内容
+                span: ({ children, className, style, ...props }) => {
+                  if (style && typeof style === 'object' && 'color' in style && style.color === 'red') {
+                    return <span className="text-red-600" {...props}>{children}</span>;
+                  }
+                  if (style && typeof style === 'object' && 'color' in style && style.color === 'blue') {
+                    return <span className="inline-block bg-blue-50 text-blue-800 px-2 py-1 my-1 rounded-md border border-blue-200 font-medium text-sm break-words align-baseline" {...props}>{children}</span>;
+                  }
+                  return <span className={className} style={style} {...props}>{children}</span>;
+                }
               }}
-              dangerouslySetInnerHTML={{
-                __html: processMarkdownContent(result.markdownContent)
-              }}
-            />
+            >
+              {result.markdownContent}
+            </ReactMarkdown>
           </CardContent>
         </Card>
 
@@ -347,4 +361,3 @@ ${result.detailedFeedback}
 };
 
 export default GradingResult;
-
