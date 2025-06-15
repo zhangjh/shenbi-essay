@@ -58,16 +58,6 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
         <Header />
 
-        {/* Main H1 标题：对于SEO更优 */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-0 md:mb-6">
-            神笔作文 - 让每个学生都能写出优秀的作文
-          </h1>
-          <p className="mt-3 text-gray-600 text-xl max-w-3xl mx-auto">
-            专为中小学生打造的作文学习平台，提供全方位的写作指导与练习，助力每一位学生提升写作水平。
-          </p>
-        </div>
-
         <HeroSection />
 
         {/* Main Features Section */}
