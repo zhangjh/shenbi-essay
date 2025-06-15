@@ -11,7 +11,7 @@ import { toast } from '@/components/ui/use-toast';
 
 interface GradingRequest {
   title: string;
-  desc: string;
+  description: string;
   level: string;
   weight: number;
   essay?: string;
@@ -59,7 +59,7 @@ const EssayGrading = () => {
     try {
       const requestData: GradingRequest = {
         title: '',
-        desc: '',
+        description: '',
         level: '',
         weight: 100
       };

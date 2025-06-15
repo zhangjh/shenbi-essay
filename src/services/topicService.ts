@@ -6,7 +6,7 @@ export interface ApiEssayTopic {
   difficulty: number; // 0-2 表示简单，中等，困难
   category: number; // 0-6 表示不同类型
   sub_category: number; // 子分类
-  desc: string;
+  description: string;
   tags: string[];
   guide?: string; // 写作指导
   mind?: string; // markdown形式的脑图数据
@@ -81,7 +81,7 @@ const transformApiDataToEssayTopic = (apiData: ApiEssayTopic): EssayTopic => {
     type: mapCategoryToType(apiData.category),
     grade: mapLevelToGrade(apiData.level),
     difficulty: mapDifficultyToText(apiData.difficulty),
-    description: apiData.desc,
+    description: apiData.description,
     tags: apiData.tags || [],
     guide: apiData.guide,
     mind: apiData.mind,

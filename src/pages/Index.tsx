@@ -112,7 +112,7 @@ const Index = () => {
                   <li>题目解析</li>
                   <li>范文学习</li>
                   <li>智能批改</li>
-                  <li>个性指导</li>
+                  <li>拍照生成</li>
                 </ul>
               </div>
               
