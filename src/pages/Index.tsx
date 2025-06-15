@@ -7,7 +7,7 @@ import GradeSelector from '@/components/GradeSelector';
 import EssayTopics from '@/components/EssayTopics';
 import FeatureCard from '@/components/FeatureCard';
 import SEO from '@/components/SEO';
-import { BookOpen, Search, Users, Upload, Edit } from 'lucide-react';
+import { BookOpen, Search, Camera, Upload, Edit } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -29,11 +29,11 @@ const Index = () => {
       onButtonClick: () => navigate('/grading')
     },
     {
-      title: "个性指导",
-      description: "根据年级和写作水平，提供个性化的写作指导和练习建议",
-      icon: <Users className="w-8 h-8 text-white" />,
-      buttonText: "获取指导",
-      onButtonClick: () => console.log("Get guidance")
+      title: "拍照生成范文",
+      description: "拍照上传题目图片，AI智能生成高质量范文，快速学习写作技巧",
+      icon: <Camera className="w-8 h-8 text-white" />,
+      buttonText: "拍照生成",
+      onButtonClick: () => navigate('/photo-essay')
     }
   ];
 

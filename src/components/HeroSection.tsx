@@ -1,7 +1,6 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Users, FileText, Edit } from 'lucide-react';
+import { BookOpen, Users, FileText, Edit, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
@@ -27,9 +26,9 @@ const HeroSection = () => {
       color: "bg-slate-500"
     },
     {
-      icon: <Users className="w-6 h-6 text-white" />,
-      title: "个性指导",
-      description: "针对不同年级提供个性化的写作指导方案",
+      icon: <Camera className="w-6 h-6 text-white" />,
+      title: "拍照生成",
+      description: "拍照上传题目图片，AI智能生成高质量范文",
       color: "bg-indigo-500"
     }
   ];
