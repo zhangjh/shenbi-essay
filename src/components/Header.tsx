@@ -4,6 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, User, Menu } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { 
+  SignedIn, 
+  SignedOut, 
+  SignInButton, 
+  SignUpButton, 
+  UserButton 
+} from "@clerk/clerk-react";
 
 const Header = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,13 +62,28 @@ const Header = () => {
 
           {/* User Actions */}
           <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm">
-              <User className="w-4 h-4 mr-2" />
-              登录
-            </Button>
-            <Button size="sm" className="gradient-bg text-white">
-              免费注册
-            </Button>
+            <SignedOut>
+              <SignInButton fallbackRedirectUrl="/">
+                <Button variant="outline" size="sm">
+                  <User className="w-4 h-4 mr-2" />
+                  登录
+                </Button>
+              </SignInButton>
+              <SignUpButton fallbackRedirectUrl="/">
+                <Button size="sm" className="gradient-bg text-white">
+                  免费注册
+                </Button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: "w-8 h-8"
+                  }
+                }}
+              />
+            </SignedIn>
           </div>
         </div>
 
@@ -81,26 +103,43 @@ const Header = () => {
                 <p className="text-xs text-gray-500">ShenBi Essay</p>
               </div>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
+            <div className="flex items-center space-x-2">
+              <SignedIn>
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8"
+                    }
+                  }}
+                />
+              </SignedIn>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Mobile menu */}
           {isMenuOpen && (
             <div className="border-t border-gray-200 py-4">
               <div className="flex flex-col space-y-2">
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <User className="w-4 h-4 mr-2" />
-                  登录
-                </Button>
-                <Button size="sm" className="gradient-bg text-white w-full">
-                  免费注册
-                </Button>
+                <SignedOut>
+                  <SignInButton fallbackRedirectUrl="/">
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <User className="w-4 h-4 mr-2" />
+                      登录
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton fallbackRedirectUrl="/">
+                    <Button size="sm" className="gradient-bg text-white w-full">
+                      免费注册
+                    </Button>
+                  </SignUpButton>
+                </SignedOut>
               </div>
             </div>
           )}
