@@ -11,7 +11,7 @@ interface SEOProps {
   noindex?: boolean;
 }
 
-const SEO = ({ 
+const SEO = ({
   title = "神笔作文（ShenBi-Essay）- 让每个学生都能写出优秀的作文",
   description = "神笔作文是专为中小学生打造的作文学习平台，提供智能批改、题目解析、范文学习、个性化指导等功能，助力学生提升写作水平。",
   keywords = "作文学习,作文批改,作文题目,小学作文,初中作文,高中作文,智能批改,写作指导,作文范文",
@@ -26,9 +26,9 @@ const SEO = ({
 
     // 更新或创建 meta 标签
     const updateMeta = (name: string, content: string) => {
-      let meta = document.querySelector(`meta[name="${name}"]`) || 
-                 document.querySelector(`meta[property="${name}"]`);
-      
+      let meta = document.querySelector(`meta[name="${name}"]`) ||
+        document.querySelector(`meta[property="${name}"]`);
+
       if (meta) {
         meta.setAttribute('content', content);
       } else {
@@ -46,13 +46,13 @@ const SEO = ({
     // 基础 SEO 标签
     updateMeta('description', description);
     updateMeta('keywords', keywords);
-    
+
     // Open Graph 标签
     updateMeta('og:title', title);
     updateMeta('og:description', description);
     updateMeta('og:type', ogType);
     updateMeta('og:image', ogImage);
-    updateMeta('og:url', window.location.href);
+    updateMeta('og:url', canonical || window.location.href);
     updateMeta('og:site_name', '神笔作文');
 
     // Twitter Card 标签
@@ -84,8 +84,8 @@ const SEO = ({
       "@type": "EducationalOrganization",
       "name": "神笔作文",
       "description": description,
-      "url": "https://shenbi.zhangjh.cn",
-      "logo": `https://shenbi.zhangjh.cn${ogImage}`,
+      "url": canonical || window.location.origin,
+      "logo": ogImage.startsWith('http') ? ogImage : `${window.location.origin}${ogImage}`,
       "contactPoint": {
         "@type": "ContactPoint",
         "email": "zhangjh_initial@126.com",
@@ -110,3 +110,4 @@ const SEO = ({
 };
 
 export default SEO;
+

@@ -37,18 +37,37 @@ const Index = () => {
     }
   ];
 
+  // 首页SEO参数
+  const seoTitle = "神笔作文 - 中小学生作文学习平台 | 智能批改 题目解析 写作指导";
+  const seoDesc = "神笔作文是专为中小学生打造的作文学习平台，提供智能批改、题目解析、范文学习、个性化指导等功能。涵盖小学、初中、高中各年级，助力学生提升写作水平。";
+  const seoKeywords = "作文学习,作文批改,作文题目,小学作文,初中作文,高中作文,智能批改,写作指导,作文范文,记叙文,议论文,说明文";
+  const canonicalUrl = window.location.origin + '/';
+
   return (
     <>
-      <SEO 
-        title="神笔作文 - 中小学生作文学习平台 | 智能批改 题目解析 写作指导"
-        description="神笔作文是专为中小学生打造的作文学习平台，提供智能批改、题目解析、范文学习、个性化指导等功能。涵盖小学、初中、高中各年级，助力学生提升写作水平。"
-        keywords="作文学习,作文批改,作文题目,小学作文,初中作文,高中作文,智能批改,写作指导,作文范文,记叙文,议论文,说明文"
-        canonical={window.location.href}
+      {/* SEO标签渲染 */}
+      <SEO
+        title={seoTitle}
+        description={seoDesc}
+        keywords={seoKeywords}
+        canonical={canonicalUrl}
+        ogImage={'/assets/logo.png'}
+        ogType="website"
       />
-      
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
         <Header />
-        
+
+        {/* Main H1 标题：对于SEO更优 */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-0 md:mb-6">
+            神笔作文 - 让每个学生都能写出优秀的作文
+          </h1>
+          <p className="mt-3 text-gray-600 text-xl max-w-3xl mx-auto">
+            专为中小学生打造的作文学习平台，提供全方位的写作指导与练习，助力每一位学生提升写作水平。
+          </p>
+        </div>
+
         <HeroSection />
 
         {/* Main Features Section */}
