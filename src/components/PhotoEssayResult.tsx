@@ -82,10 +82,32 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl }: PhotoEssayResul
         </CardHeader>
         <CardContent>
           {content ? (
-            <div className="prose max-w-none">
+            <div className="prose max-w-none prose-sm sm:prose-base">
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
-                className="markdown-content"
+                className="text-gray-800 leading-relaxed"
+                components={{
+                  p: ({ children }) => (
+                    <p className="mb-4 text-justify leading-7 text-gray-800">
+                      {children}
+                    </p>
+                  ),
+                  h1: ({ children }) => (
+                    <h1 className="text-xl font-bold mb-4 text-gray-900 text-center">
+                      {children}
+                    </h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-lg font-semibold mb-3 text-gray-900">
+                      {children}
+                    </h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="text-base font-medium mb-2 text-gray-900">
+                      {children}
+                    </h3>
+                  ),
+                }}
               >
                 {content}
               </ReactMarkdown>
