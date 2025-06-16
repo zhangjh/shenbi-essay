@@ -67,9 +67,7 @@ const mapCategoryToType = (category: number): string => {
     1: '说明文',
     2: '应用文',
     3: '议论文',
-    4: '散文',
-    5: '小说',
-    6: '其他'
+    4: '其他'
   };
   return categoryMap[category as keyof typeof categoryMap] || '其他';
 };

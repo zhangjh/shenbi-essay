@@ -268,8 +268,7 @@ const FeaturedTopics = () => {
                 <SelectItem value="说明文">说明文</SelectItem>
                 <SelectItem value="应用文">应用文</SelectItem>
                 <SelectItem value="议论文">议论文</SelectItem>
-                <SelectItem value="散文">散文</SelectItem>
-                <SelectItem value="小说">小说</SelectItem>
+                <SelectItem value="其他">其他</SelectItem>
               </SelectContent>
             </Select>
 

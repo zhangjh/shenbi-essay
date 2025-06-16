@@ -45,9 +45,7 @@ const categoryOptions = [
   { value: '1', label: '说明文' },
   { value: '2', label: '应用文' },
   { value: '3', label: '议论文' },
-  { value: '4', label: '散文' },
-  { value: '5', label: '小说' },
-  { value: '6', label: '其他' },
+  { value: '4', label: '其他' },
 ];
 
 // 子分类映射关系
@@ -73,15 +71,6 @@ const subCategoryMap: Record<number, { value: string; label: string }[]> = {
     { value: '1', label: '驳论' },
   ],
   4: [
-    { value: '0', label: '抒情散文' },
-    { value: '1', label: '叙事散文' },
-    { value: '2', label: '议论散文' },
-  ],
-  5: [
-    { value: '0', label: '短篇小说' },
-    { value: '1', label: '微型小说' },
-  ],
-  6: [
     { value: '0', label: '其他' },
   ],
 };

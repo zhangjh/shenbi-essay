@@ -41,9 +41,7 @@ const TopicGenerator = () => {
     { value: '1', label: '说明文' },
     { value: '2', label: '应用文' },
     { value: '3', label: '议论文' },
-    { value: '4', label: '散文' },
-    { value: '5', label: '小说' },
-    { value: '6', label: '其他' }
+    { value: '4', label: '其他' }
   ];
 
   const difficultyOptions = [

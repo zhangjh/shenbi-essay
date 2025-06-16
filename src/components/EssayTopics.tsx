@@ -142,8 +142,6 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
       case '议论文': return <Users className="w-4 h-4" />;
       case '说明文': 
       case '应用文': 
-      case '散文':
-      case '小说':
       case '其他':
         return <FileText className="w-4 h-4" />;
       default: return <BookOpen className="w-4 h-4" />;

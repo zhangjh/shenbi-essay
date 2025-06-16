@@ -120,8 +120,6 @@ const TopicAnalysis = () => {
       case '议论文': return <Users className="w-5 h-5" />;
       case '说明文': 
       case '应用文': 
-      case '散文':
-      case '小说':
       case '其他':
         return <FileText className="w-5 h-5" />;
       default: return <BookOpen className="w-5 h-5" />;
