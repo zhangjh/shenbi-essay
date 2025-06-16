@@ -1,6 +1,6 @@
-
+const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
 export const generateEssayFromImage = async (imageBase64: string): Promise<ReadableStream> => {
-  const response = await fetch('https://tx.zhangjh.cn/shenbi/essay/generateByImg', {
+  const response = await fetch(`${API_BASE_URL}/essay/generateByImg`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

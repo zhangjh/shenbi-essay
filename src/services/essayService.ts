@@ -29,9 +29,10 @@ interface EssayShareResponse {
   errorMsg?: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
 export const fetchEssayByTopic = async (topicId: string): Promise<EssayResponse> => {
   try {
-    const response = await fetch(`https://tx.zhangjh.cn/shenbi/essay/queryByTopic/${topicId}`);
+    const response = await fetch(`${API_BASE_URL}/essay/queryByTopic/${topicId}`);
     const data = await response.json();
     return data;
   } catch (error) {
@@ -44,7 +45,7 @@ export const fetchEssayByTopic = async (topicId: string): Promise<EssayResponse>
 
 export const generateEssayBatch = async (topicIds: string[]): Promise<EssayGenerateResponse> => {
   try {
-    const response = await fetch('https://tx.zhangjh.cn/shenbi/essay/generateBatch', {
+    const response = await fetch(`${API_BASE_URL}/essay/generateBatch`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -65,7 +66,7 @@ export const generateEssayBatch = async (topicIds: string[]): Promise<EssayGener
 
 export const auditEssay = async (essayId: string): Promise<EssayAuditResponse> => {
   try {
-    const response = await fetch('https://tx.zhangjh.cn/shenbi/essay/audit', {
+    const response = await fetch(`${API_BASE_URL}/essay/audit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -86,7 +87,7 @@ export const auditEssay = async (essayId: string): Promise<EssayAuditResponse> =
 
 export const shareEssay = async (essayId: string): Promise<EssayShareResponse> => {
   try {
-    const response = await fetch('https://tx.zhangjh.cn/shenbi/essay/share', {
+    const response = await fetch(`${API_BASE_URL}/essay/share`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

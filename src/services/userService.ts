@@ -9,9 +9,10 @@ interface RegisterUserData {
   productType: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN;
 export const registerUser = async (userData: RegisterUserData) => {
   try {
-    const response = await fetch('https://tx.zhangjh.cn/user/register', {
+    const response = await fetch(`${API_BASE_URL}/user/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

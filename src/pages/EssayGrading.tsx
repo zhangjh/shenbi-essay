@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
+const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
+
 interface GradingRequest {
   title: string;
   description: string;
@@ -107,7 +109,7 @@ const EssayGrading = () => {
 
       console.log('Sending grading request:', requestData);
 
-      const response = await fetch('https://tx.zhangjh.cn/shenbi/essay/grading', {
+      const response = await fetch(`${API_BASE_URL}/essay/grading`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

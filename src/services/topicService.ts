@@ -65,8 +65,8 @@ export interface TopicGenerateResponse {
   errorMsg?: string;
 }
 
-// const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
-const API_BASE_URL = 'https://tx.zhangjh.cn/shenbi';
+const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
+// const API_BASE_URL = 'https://tx.zhangjh.cn/shenbi';
 
 // 映射函数
 const mapLevelToGrade = (level: number): string => {
