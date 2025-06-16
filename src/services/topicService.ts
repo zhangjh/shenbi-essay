@@ -1,4 +1,3 @@
-
 export interface ApiEssayTopic {
   id: string;
   title: string;
@@ -32,6 +31,7 @@ export interface EssayTopic {
 export interface TopicSearchParams {
   title?: string;
   level?: number;
+  levels?: number[]; // 新增：支持多个level值
   category?: number;
   sub_category?: number;
   important?: number;
@@ -116,6 +116,10 @@ export const searchEssayTopics = async (params: TopicSearchParams): Promise<{ da
     
     if (params.title) searchParams.append('title', params.title);
     if (params.level !== undefined) searchParams.append('level', params.level.toString());
+    // 新增：支持levels数组参数
+    if (params.levels && params.levels.length > 0) {
+      searchParams.append('levels', params.levels.join(','));
+    }
     if (params.category !== undefined) searchParams.append('category', params.category.toString());
     if (params.sub_category !== undefined) searchParams.append('sub_category', params.sub_category.toString());
     if (params.important !== undefined) searchParams.append('important', params.important.toString());

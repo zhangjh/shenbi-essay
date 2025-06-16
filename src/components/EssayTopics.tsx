@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,10 +60,9 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
       const levels = getGradeLevel(selectedGrade);
       if (levels.length === 0) return;
       
-      // 为了简化，这里使用第一个level值进行查询
-      // 实际项目中可能需要分别查询所有level然后合并结果
+      // 修改为传递levels数组而不是单个level
       const data = await searchEssayTopics({
-        level: levels[0],
+        levels: levels, // 传递整个levels数组
         important: 1,
         page,
         pageSize
