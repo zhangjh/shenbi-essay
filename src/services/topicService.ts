@@ -1,4 +1,3 @@
-
 export interface ApiEssayTopic {
   id: string;
   title: string;
@@ -41,6 +40,20 @@ export interface TopicSearchParams {
   audit?: number; // 新增：审核状态参数
   page?: number;
   pageSize?: number;
+}
+
+export interface TopicGenerateParams {
+  title?: string;
+  level?: number;
+  category?: number;
+  difficulty?: number;
+  count: number;
+}
+
+export interface TopicGenerateResponse {
+  success: boolean;
+  data?: string[];
+  errorMsg?: string;
 }
 
 // const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
@@ -170,5 +183,47 @@ export const fetchTopicById = async (id: string): Promise<EssayTopic> => {
   } catch (error) {
     console.error('Failed to fetch topic by id:', error);
     throw new Error('获取题目详情失败');
+  }
+};
+
+export const generateTopics = async (params: TopicGenerateParams): Promise<TopicGenerateResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/topic/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(params)
+    });
+    
+    const res = await response.json();
+    return res;
+  } catch (error) {
+    console.error('Failed to generate topics:', error);
+    return {
+      success: false,
+      errorMsg: '生成题目失败'
+    };
+  }
+};
+
+export const auditTopic = async (topicId: string): Promise<{ success: boolean; errorMsg?: string }> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/topic/audit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ topicId })
+    });
+    
+    const res = await response.json();
+    return res;
+  } catch (error) {
+    console.error('Failed to audit topic:', error);
+    return {
+      success: false,
+      errorMsg: '审核失败'
+    };
   }
 };

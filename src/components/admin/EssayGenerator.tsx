@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Loader2, FileText, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { searchEssayTopics, EssayTopic } from '@/services/topicService';
+import { generateEssayBatch } from '@/services/essayService';
 
 const EssayGenerator = () => {
   const [loading, setLoading] = useState(false);
@@ -61,14 +62,16 @@ const EssayGenerator = () => {
 
     setLoading(true);
     try {
-      // 这里调用后端API生成范文
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 模拟API调用
+      const result = await generateEssayBatch(selectedTopics);
       
-      // 模拟生成的范文ID
-      const mockIds = selectedTopics.map(topicId => `essay_${topicId}_${Date.now()}`);
-      setGeneratedEssayIds(mockIds);
-      setShowResultDialog(true);
-      setSelectedTopics([]);
+      if (result.success && result.data) {
+        setGeneratedEssayIds(result.data);
+        setShowResultDialog(true);
+        setSelectedTopics([]);
+        toast.success(`成功生成 ${result.data.length} 篇范文`);
+      } else {
+        toast.error(result.errorMsg || '生成失败，请重试');
+      }
     } catch (error) {
       toast.error('生成失败，请重试');
     } finally {

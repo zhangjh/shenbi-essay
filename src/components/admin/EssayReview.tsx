@@ -22,6 +22,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { auditEssay } from '@/services/essayService';
 
 interface PendingEssay {
   id: string;
@@ -57,7 +58,7 @@ const EssayReview = () => {
           author: '小明',
           content: '我的家乡是一个美丽的小城市，坐落在青山绿水之间。春天的时候，山花烂漫，溪水潺潺；夏天的时候，绿树成荫，凉风习习...',
           submittedBy: '用户123',
-          submittedAt: '2025-01-10',
+          submittedAt: '2025-01-10 14:30:25',
           status: 'pending',
           score: 85
         },
@@ -68,7 +69,7 @@ const EssayReview = () => {
           author: '小红',
           content: '随着科技的飞速发展，我们的生活发生了翻天覆地的变化。科技给我们带来了便利，但同时也带来了一些挑战...',
           submittedBy: '用户456',
-          submittedAt: '2025-01-09',
+          submittedAt: '2025-01-09 16:45:12',
           status: 'pending',
           score: 92
         }
@@ -83,11 +84,15 @@ const EssayReview = () => {
 
   const handleApprove = async (id: string) => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setEssays(prev => prev.map(essay => 
-        essay.id === id ? { ...essay, status: 'approved' as const } : essay
-      ));
-      toast.success('范文审核通过');
+      const result = await auditEssay(id);
+      if (result.success) {
+        setEssays(prev => prev.map(essay => 
+          essay.id === id ? { ...essay, status: 'approved' as const } : essay
+        ));
+        toast.success('范文审核通过');
+      } else {
+        toast.error(result.errorMsg || '操作失败');
+      }
     } catch (error) {
       toast.error('操作失败');
     }
@@ -116,6 +121,17 @@ const EssayReview = () => {
       default:
         return null;
     }
+  };
+
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   };
 
   const filteredEssays = essays.filter(essay => 
@@ -157,7 +173,6 @@ const EssayReview = () => {
               <TableHead>作文标题</TableHead>
               <TableHead>所属题目</TableHead>
               <TableHead>作者</TableHead>
-              <TableHead>评分</TableHead>
               <TableHead>提交者</TableHead>
               <TableHead>提交时间</TableHead>
               <TableHead>状态</TableHead>
@@ -197,15 +212,8 @@ const EssayReview = () => {
                   <Badge variant="outline">{essay.topicTitle}</Badge>
                 </TableCell>
                 <TableCell>{essay.author}</TableCell>
-                <TableCell>
-                  {essay.score ? (
-                    <Badge variant="secondary">{essay.score}分</Badge>
-                  ) : (
-                    <span className="text-gray-400">未评分</span>
-                  )}
-                </TableCell>
                 <TableCell>{essay.submittedBy}</TableCell>
-                <TableCell>{essay.submittedAt}</TableCell>
+                <TableCell>{formatDateTime(essay.submittedAt)}</TableCell>
                 <TableCell>{getStatusBadge(essay.status)}</TableCell>
                 <TableCell>
                   {essay.status === 'pending' && (

@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, Plus, Trash2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateTopics } from '@/services/topicService';
 
 const TopicGenerator = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,6 @@ const TopicGenerator = () => {
     level: '',
     category: '',
     difficulty: '',
-    description: '',
     tags: [] as string[],
     count: '1'
   });
@@ -44,8 +44,6 @@ const TopicGenerator = () => {
     { value: '1', label: '说明文' },
     { value: '2', label: '应用文' },
     { value: '3', label: '议论文' },
-    { value: '4', label: '散文' },
-    { value: '5', label: '小说' },
     { value: '6', label: '其他' }
   ];
 
@@ -74,28 +72,43 @@ const TopicGenerator = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const count = parseInt(formData.count);
+    if (isNaN(count) || count < 1 || count > 50) {
+      toast.error('生成数量必须为1-50之间的数字');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // 这里调用后端API生成题目
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 模拟API调用
+      const params = {
+        ...(formData.title && { title: formData.title }),
+        ...(formData.level && { level: parseInt(formData.level) }),
+        ...(formData.category && { category: parseInt(formData.category) }),
+        ...(formData.difficulty && { difficulty: parseInt(formData.difficulty) }),
+        count
+      };
+
+      const result = await generateTopics(params);
       
-      // 模拟生成的题目ID
-      const count = parseInt(formData.count);
-      const mockIds = Array.from({ length: count }, (_, i) => `topic_${Date.now()}_${i + 1}`);
-      setGeneratedTopicIds(mockIds);
-      setShowResultDialog(true);
-      
-      // 重置表单
-      setFormData({
-        title: '',
-        level: '',
-        category: '',
-        difficulty: '',
-        description: '',
-        tags: [],
-        count: '1'
-      });
+      if (result.success && result.data) {
+        setGeneratedTopicIds(result.data);
+        setShowResultDialog(true);
+        toast.success(`成功生成 ${result.data.length} 个题目`);
+        
+        // 重置表单
+        setFormData({
+          title: '',
+          level: '',
+          category: '',
+          difficulty: '',
+          tags: [],
+          count: '1'
+        });
+      } else {
+        toast.error(result.errorMsg || '生成失败，请重试');
+      }
     } catch (error) {
       toast.error('生成失败，请重试');
     } finally {
@@ -126,7 +139,7 @@ const TopicGenerator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="level">年级</Label>
+                <Label htmlFor="level">年级（可选）</Label>
                 <Select value={formData.level} onValueChange={(value) => setFormData(prev => ({ ...prev, level: value }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="选择年级" />
@@ -142,7 +155,7 @@ const TopicGenerator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">文体类型</Label>
+                <Label htmlFor="category">文体类型（可选）</Label>
                 <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="选择文体类型" />
@@ -158,7 +171,7 @@ const TopicGenerator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="difficulty">难度等级</Label>
+                <Label htmlFor="difficulty">难度等级（可选）</Label>
                 <Select value={formData.difficulty} onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="选择难度等级" />
@@ -175,18 +188,15 @@ const TopicGenerator = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="count">生成数量</Label>
-                <Select value={formData.count} onValueChange={(value) => setFormData(prev => ({ ...prev, count: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择生成数量" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[1, 2, 3, 4, 5, 10].map(num => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num}个
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="count"
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={formData.count}
+                  onChange={(e) => setFormData(prev => ({ ...prev, count: e.target.value }))}
+                  placeholder="输入生成数量(1-50)"
+                />
               </div>
             </div>
 
@@ -194,8 +204,6 @@ const TopicGenerator = () => {
               <Label htmlFor="description">题目描述（可选）</Label>
               <Textarea
                 id="description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="请输入题目描述和要求"
                 rows={4}
               />
@@ -258,7 +266,7 @@ const TopicGenerator = () => {
           </DialogHeader>
           <div className="space-y-2">
             <p className="font-medium">生成的题目ID：</p>
-            <div className="space-y-1">
+            <div className="space-y-1 max-h-60 overflow-y-auto">
               {generatedTopicIds.map(id => (
                 <div key={id} className="text-sm bg-gray-100 p-2 rounded">
                   {id}
