@@ -52,7 +52,16 @@ export interface TopicGenerateParams {
 
 export interface TopicGenerateResponse {
   success: boolean;
-  data?: string[];
+  data?: Array<{
+    title: string;
+    level?: number;
+    category?: number;
+    sub_category?: number;
+    difficulty?: number;
+    description?: string;
+    guide?: string;
+    mind?: string;
+  }>;
   errorMsg?: string;
 }
 

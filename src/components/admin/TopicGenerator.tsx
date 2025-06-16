@@ -14,7 +14,7 @@ import { generateTopics } from '@/services/topicService';
 const TopicGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [showResultDialog, setShowResultDialog] = useState(false);
-  const [generatedTopicIds, setGeneratedTopicIds] = useState<string[]>([]);
+  const [generatedTopics, setGeneratedTopics] = useState<Array<{ title: string }>>([]);
   const [formData, setFormData] = useState({
     title: '',
     level: '',
@@ -92,7 +92,7 @@ const TopicGenerator = () => {
       const result = await generateTopics(params);
       
       if (result.success && result.data) {
-        setGeneratedTopicIds(result.data);
+        setGeneratedTopics(result.data);
         setShowResultDialog(true);
         toast.success(`成功生成 ${result.data.length} 个题目`);
         
@@ -266,15 +266,15 @@ const TopicGenerator = () => {
           <DialogHeader>
             <DialogTitle>题目生成成功</DialogTitle>
             <DialogDescription>
-              成功生成 {generatedTopicIds.length} 个题目
+              成功生成 {generatedTopics.length} 个题目
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
-            <p className="font-medium">生成的题目ID：</p>
+            <p className="font-medium">生成的题目：</p>
             <div className="space-y-1 max-h-60 overflow-y-auto">
-              {generatedTopicIds.map(id => (
-                <div key={id} className="text-sm bg-gray-100 p-2 rounded">
-                  {id}
+              {generatedTopics.map((topic) => (
+                <div key={topic.title} className="text-sm bg-gray-100 p-2 rounded">
+                  {topic.title}
                 </div>
               ))}
             </div>
