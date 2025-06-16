@@ -1,3 +1,4 @@
+
 export interface ApiEssayTopic {
   id: string;
   title: string;
@@ -37,6 +38,7 @@ export interface TopicSearchParams {
   important?: number;
   source?: string;
   difficulty?: number;
+  audit?: number; // 新增：审核状态参数
   page?: number;
   pageSize?: number;
 }
@@ -125,6 +127,7 @@ export const searchEssayTopics = async (params: TopicSearchParams): Promise<{ da
     if (params.important !== undefined) searchParams.append('important', params.important.toString());
     if (params.source) searchParams.append('source', params.source);
     if (params.difficulty !== undefined) searchParams.append('difficulty', params.difficulty.toString());
+    if (params.audit !== undefined) searchParams.append('audit', params.audit.toString()); // 新增audit参数
     
     searchParams.append('page', (params.page || 1).toString());
     searchParams.append('pageSize', (params.pageSize || 20).toString());
