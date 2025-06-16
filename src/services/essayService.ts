@@ -24,6 +24,11 @@ interface EssayAuditResponse {
   errorMsg?: string;
 }
 
+interface EssayShareResponse {
+  success: boolean;
+  errorMsg?: string;
+}
+
 export const fetchEssayByTopic = async (topicId: string): Promise<EssayResponse> => {
   try {
     const response = await fetch(`https://tx.zhangjh.cn/shenbi/essay/queryByTopic/${topicId}`);
@@ -75,6 +80,27 @@ export const auditEssay = async (essayId: string): Promise<EssayAuditResponse> =
     return {
       success: false,
       errorMsg: '审核失败'
+    };
+  }
+};
+
+export const shareEssay = async (essayId: string): Promise<EssayShareResponse> => {
+  try {
+    const response = await fetch('https://tx.zhangjh.cn/shenbi/essay/share', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ essayId })
+    });
+    
+    const res = await response.json();
+    return res;
+  } catch (error) {
+    console.error('Failed to share essay:', error);
+    return {
+      success: false,
+      errorMsg: '共享失败'
     };
   }
 };

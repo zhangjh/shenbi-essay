@@ -9,7 +9,6 @@ import {
   PlusCircle, 
   FileText, 
   Users, 
-  CheckCircle, 
   Star,
   ArrowLeft,
   Loader2,
@@ -19,7 +18,6 @@ import AdminLogin from '@/components/admin/AdminLogin';
 import TopicGenerator from '@/components/admin/TopicGenerator';
 import EssayGenerator from '@/components/admin/EssayGenerator';
 import TopicReview from '@/components/admin/TopicReview';
-import EssayReview from '@/components/admin/EssayReview';
 import FeaturedTopics from '@/components/admin/FeaturedTopics';
 
 const Admin = () => {
@@ -78,7 +76,7 @@ const Admin = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-white shadow-sm">
+          <TabsList className="grid w-full grid-cols-4 bg-white shadow-sm">
             <TabsTrigger value="generator" className="flex items-center space-x-2">
               <PlusCircle className="w-4 h-4" />
               <span className="hidden sm:inline">题目生成</span>
@@ -90,10 +88,6 @@ const Admin = () => {
             <TabsTrigger value="topic-review" className="flex items-center space-x-2">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">题目审核</span>
-            </TabsTrigger>
-            <TabsTrigger value="essay-review" className="flex items-center space-x-2">
-              <CheckCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">范文审核</span>
             </TabsTrigger>
             <TabsTrigger value="featured" className="flex items-center space-x-2">
               <Star className="w-4 h-4" />
@@ -111,10 +105,6 @@ const Admin = () => {
 
           <TabsContent value="topic-review">
             <TopicReview />
-          </TabsContent>
-
-          <TabsContent value="essay-review">
-            <EssayReview />
           </TabsContent>
 
           <TabsContent value="featured">

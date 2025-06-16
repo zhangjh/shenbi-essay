@@ -2,9 +2,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, RotateCcw } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { FileText, RotateCcw, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { shareEssay } from '@/services/essayService';
+import { toast } from '@/components/ui/sonner';
 
 interface PhotoEssayResultProps {
   stream: ReadableStream;
@@ -15,6 +18,9 @@ interface PhotoEssayResultProps {
 const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl }: PhotoEssayResultProps) => {
   const [content, setContent] = useState('');
   const [isComplete, setIsComplete] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [wantToShare, setWantToShare] = useState(false);
+  const [essayId, setEssayId] = useState<string | null>(null);
 
   useEffect(() => {
     const readStream = async () => {
@@ -27,6 +33,8 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl }: PhotoEssayResul
           
           if (done) {
             setIsComplete(true);
+            // 生成完成后，可以从后端获取essayId（这里模拟生成一个ID）
+            setEssayId(`essay_${Date.now()}`);
             break;
           }
 
@@ -41,6 +49,35 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl }: PhotoEssayResul
 
     readStream();
   }, [stream]);
+
+  const handleShare = async () => {
+    if (!essayId) {
+      toast.error('无法共享', {
+        description: '范文ID不存在'
+      });
+      return;
+    }
+
+    setIsSharing(true);
+    try {
+      const result = await shareEssay(essayId);
+      if (result.success) {
+        toast.success('共享成功', {
+          description: '您的范文已共享到社区'
+        });
+      } else {
+        toast.error('共享失败', {
+          description: result.errorMsg || '请稍后重试'
+        });
+      }
+    } catch (error) {
+      toast.error('共享失败', {
+        description: '网络错误，请稍后重试'
+      });
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -125,6 +162,38 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl }: PhotoEssayResul
             <div className="mt-4 flex items-center text-sm text-blue-600">
               <div className="animate-pulse w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
               正在生成中...
+            </div>
+          )}
+
+          {/* 共享选项 */}
+          {isComplete && content && (
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border">
+              <div className="flex items-center space-x-3">
+                <Checkbox 
+                  id="share-essay"
+                  checked={wantToShare}
+                  onCheckedChange={(checked) => setWantToShare(checked as boolean)}
+                />
+                <label 
+                  htmlFor="share-essay" 
+                  className="text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  将此范文共享到社区，帮助其他同学学习
+                </label>
+              </div>
+              {wantToShare && (
+                <div className="mt-3">
+                  <Button 
+                    onClick={handleShare}
+                    disabled={isSharing}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    {isSharing ? '共享中...' : '立即共享'}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
