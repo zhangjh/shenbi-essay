@@ -20,6 +20,11 @@ interface GradingRequest {
   topicImg?: string;
 }
 
+interface GradingResult {
+  markdownContent: string;
+  isMarkdown: boolean;
+}
+
 const EssayGrading = () => {
   const navigate = useNavigate();
   // 作文文件
@@ -27,7 +32,7 @@ const EssayGrading = () => {
   // 题目文件（可选）
   const [topicFile, setTopicFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [gradingResult, setGradingResult] = useState<any>(null);
+  const [gradingResult, setGradingResult] = useState<GradingResult>(null);
 
   // 处理题目上传
   const handleTopicUpload = (file: File) => {

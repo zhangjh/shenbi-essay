@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -194,7 +193,13 @@ const TopicGenerator = () => {
                   min="1"
                   max="50"
                   value={formData.count}
-                  onChange={(e) => setFormData(prev => ({ ...prev, count: e.target.value }))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // 确保输入的是有效数字且在范围内
+                    if (value === '' || (Number(value) >= 1 && Number(value) <= 50)) {
+                      setFormData(prev => ({ ...prev, count: value }));
+                    }
+                  }}
                   placeholder="输入生成数量(1-50)"
                 />
               </div>
