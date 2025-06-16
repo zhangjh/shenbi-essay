@@ -1,10 +1,19 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
 import { BookOpen, Users, FileText, Loader2 } from 'lucide-react';
-import { fetchEssayTopics, EssayTopic } from '@/services/topicService';
+import { searchEssayTopics, EssayTopic } from '@/services/topicService';
 
 interface EssayTopicsProps {
   selectedGrade: string;
@@ -14,32 +23,111 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
   const navigate = useNavigate();
   const [topics, setTopics] = useState<EssayTopic[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const pageSize = 9;
 
+  // 检测是否为移动端
   useEffect(() => {
-    const loadTopics = async () => {
-      try {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 获取年级对应的level参数
+  const getGradeLevel = (grade: string) => {
+    if (grade === 'elementary') return [3, 4, 5, 6]; // 小学3-6年级
+    if (grade === 'middle') return [7, 8, 9]; // 初中7-9年级
+    if (grade === 'high') return [10, 11, 12]; // 高中10-12年级
+    return [];
+  };
+
+  const loadTopics = useCallback(async (page: number, append: boolean = false) => {
+    try {
+      if (append) {
+        setLoadingMore(true);
+      } else {
         setLoading(true);
-        setError(null);
-        const data = await fetchEssayTopics();
-        setTopics(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '获取数据失败');
-        console.error('Error loading topics:', err);
-      } finally {
-        setLoading(false);
+      }
+      setError(null);
+      
+      const levels = getGradeLevel(selectedGrade);
+      if (levels.length === 0) return;
+      
+      // 为了简化，这里使用第一个level值进行查询
+      // 实际项目中可能需要分别查询所有level然后合并结果
+      const data = await searchEssayTopics({
+        level: levels[0],
+        important: 1,
+        page,
+        pageSize
+      });
+      
+      if (append) {
+        setTopics(prev => [...prev, ...data.data]);
+      } else {
+        setTopics(data.data);
+      }
+      
+      setTotalPages(Math.ceil(data.total / pageSize));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '获取数据失败');
+      console.error('Error loading topics:', err);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [selectedGrade]);
+
+  // 初始加载
+  useEffect(() => {
+    setCurrentPage(1);
+    setTopics([]);
+    loadTopics(1, false);
+  }, [selectedGrade, loadTopics]);
+
+  // 桌面端翻页
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    loadTopics(page, false);
+    // 滚动到顶部
+    document.querySelector('#essay-topics-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // 移动端下拉加载更多
+  const loadMore = () => {
+    if (currentPage < totalPages && !loadingMore) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      loadTopics(nextPage, true);
+    }
+  };
+
+  // 移动端滚动监听
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      // 当滚动到距离底部100px时触发加载
+      if (scrollTop + windowHeight >= documentHeight - 100) {
+        loadMore();
       }
     };
 
-    loadTopics();
-  }, []);
-
-  const filteredTopics = topics.filter(topic => {
-    if (selectedGrade === 'elementary') return topic.grade === '小学';
-    if (selectedGrade === 'middle') return topic.grade === '初中';
-    if (selectedGrade === 'high') return topic.grade === '高中';
-    return false;
-  });
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMobile, currentPage, totalPages, loadingMore]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -64,9 +152,9 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
     }
   };
 
-  if (loading) {
+  if (loading && topics.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" id="essay-topics-section">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">精选作文题目</h2>
           <p className="text-gray-600">根据年级筛选，找到最适合的练习题目</p>
@@ -79,30 +167,30 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
     );
   }
 
-  if (error) {
+  if (error && topics.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" id="essay-topics-section">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">精选作文题目</h2>
           <p className="text-gray-600">根据年级筛选，找到最适合的练习题目</p>
         </div>
         <div className="text-center py-12">
           <p className="text-red-600 mb-4">{error}</p>
-          <Button onClick={() => window.location.reload()}>重新加载</Button>
+          <Button onClick={() => loadTopics(1, false)}>重新加载</Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" id="essay-topics-section">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">精选作文题目</h2>
         <p className="text-gray-600">根据年级筛选，找到最适合的练习题目</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTopics.map((topic) => (
+        {topics.map((topic) => (
           <Card 
             key={topic.id}
             className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
@@ -138,6 +226,85 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
           </Card>
         ))}
       </div>
+
+      {/* 移动端加载更多指示器 */}
+      {isMobile && currentPage < totalPages && (
+        <div className="flex justify-center py-6">
+          {loadingMore ? (
+            <div className="flex items-center">
+              <Loader2 className="w-5 h-5 animate-spin text-primary mr-2" />
+              <span className="text-gray-600">正在加载更多...</span>
+            </div>
+          ) : (
+            <Button 
+              variant="outline" 
+              onClick={loadMore}
+              className="px-6"
+            >
+              加载更多
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* 桌面端分页器 */}
+      {!isMobile && totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                  className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                >
+                  上一页
+                </PaginationPrevious>
+              </PaginationItem>
+              
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <PaginationItem key={pageNum}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(pageNum)}
+                      isActive={currentPage === pageNum}
+                      className="cursor-pointer"
+                    >
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                  className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                >
+                  下一页
+                </PaginationNext>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+
+      {/* 移动端到达底部提示 */}
+      {isMobile && currentPage >= totalPages && topics.length > 0 && (
+        <div className="text-center py-6 text-gray-500">
+          已加载全部内容
+        </div>
+      )}
     </div>
   );
 };
