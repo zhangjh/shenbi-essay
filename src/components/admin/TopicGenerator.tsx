@@ -7,19 +7,22 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, Plus, Trash2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateTopics } from '@/services/topicService';
 
 const TopicGenerator = () => {
   const [loading, setLoading] = useState(false);
+  const [showResultDialog, setShowResultDialog] = useState(false);
+  const [generatedTopicIds, setGeneratedTopicIds] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     level: '',
     category: '',
     difficulty: '',
-    description: '',
     tags: [] as string[],
-    guide: ''
+    count: '1'
   });
   const [newTag, setNewTag] = useState('');
 
@@ -69,22 +72,43 @@ const TopicGenerator = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const count = parseInt(formData.count);
+    if (isNaN(count) || count < 1 || count > 50) {
+      toast.error('生成数量必须为1-50之间的数字');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // 这里调用后端API生成题目
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 模拟API调用
-      toast.success('题目生成成功！');
-      // 重置表单
-      setFormData({
-        title: '',
-        level: '',
-        category: '',
-        difficulty: '',
-        description: '',
-        tags: [],
-        guide: ''
-      });
+      const params = {
+        ...(formData.title && { title: formData.title }),
+        ...(formData.level && { level: parseInt(formData.level) }),
+        ...(formData.category && { category: parseInt(formData.category) }),
+        ...(formData.difficulty && { difficulty: parseInt(formData.difficulty) }),
+        count
+      };
+
+      const result = await generateTopics(params);
+      
+      if (result.success && result.data) {
+        setGeneratedTopicIds(result.data);
+        setShowResultDialog(true);
+        toast.success(`成功生成 ${result.data.length} 个题目`);
+        
+        // 重置表单
+        setFormData({
+          title: '',
+          level: '',
+          category: '',
+          difficulty: '',
+          tags: [],
+          count: '1'
+        });
+      } else {
+        toast.error(result.errorMsg || '生成失败，请重试');
+      }
     } catch (error) {
       toast.error('生成失败，请重试');
     } finally {
@@ -93,145 +117,166 @@ const TopicGenerator = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <Wand2 className="w-5 h-5" />
-          <span>作文题目生成工具</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Wand2 className="w-5 h-5" />
+            <span>作文题目生成工具</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="title">题目标题（可选）</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="请输入作文题目"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="level">年级（可选）</Label>
+                <Select value={formData.level} onValueChange={(value) => setFormData(prev => ({ ...prev, level: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择年级" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gradeOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">文体类型（可选）</Label>
+                <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择文体类型" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categoryOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="difficulty">难度等级（可选）</Label>
+                <Select value={formData.difficulty} onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择难度等级" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {difficultyOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="count">生成数量</Label>
+                <Input
+                  id="count"
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={formData.count}
+                  onChange={(e) => setFormData(prev => ({ ...prev, count: e.target.value }))}
+                  placeholder="输入生成数量(1-50)"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="title">题目标题</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="请输入作文题目"
-                required
+              <Label htmlFor="description">题目描述（可选）</Label>
+              <Textarea
+                id="description"
+                placeholder="请输入题目描述和要求"
+                rows={4}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="level">年级</Label>
-              <Select value={formData.level} onValueChange={(value) => setFormData(prev => ({ ...prev, level: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择年级" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gradeOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>标签（可选）</Label>
+              <div className="flex space-x-2 mb-2">
+                <Input
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="添加标签"
+                  className="flex-1"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                />
+                <Button type="button" onClick={addTag} variant="outline" size="sm">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {formData.tags.map(tag => (
+                  <Badge key={tag} variant="secondary" className="flex items-center space-x-1">
+                    <span>{tag}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="ml-1 hover:text-red-600"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category">文体类型</Label>
-              <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择文体类型" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoryOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  生成中...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-4 h-4 mr-2" />
+                  生成题目
+                </>
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-            <div className="space-y-2">
-              <Label htmlFor="difficulty">难度等级</Label>
-              <Select value={formData.difficulty} onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择难度等级" />
-                </SelectTrigger>
-                <SelectContent>
-                  {difficultyOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
+      <Dialog open={showResultDialog} onOpenChange={setShowResultDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>题目生成成功</DialogTitle>
+            <DialogDescription>
+              成功生成 {generatedTopicIds.length} 个题目
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-2">
-            <Label htmlFor="description">题目描述</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="请输入题目描述和要求"
-              rows={4}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>标签</Label>
-            <div className="flex space-x-2 mb-2">
-              <Input
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                placeholder="添加标签"
-                className="flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-              />
-              <Button type="button" onClick={addTag} variant="outline" size="sm">
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.tags.map(tag => (
-                <Badge key={tag} variant="secondary" className="flex items-center space-x-1">
-                  <span>{tag}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="ml-1 hover:text-red-600"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </Badge>
+            <p className="font-medium">生成的题目ID：</p>
+            <div className="space-y-1 max-h-60 overflow-y-auto">
+              {generatedTopicIds.map(id => (
+                <div key={id} className="text-sm bg-gray-100 p-2 rounded">
+                  {id}
+                </div>
               ))}
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="guide">写作指导</Label>
-            <Textarea
-              id="guide"
-              value={formData.guide}
-              onChange={(e) => setFormData(prev => ({ ...prev, guide: e.target.value }))}
-              placeholder="请输入写作指导内容（可选）"
-              rows={4}
-            />
-          </div>
-
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                生成中...
-              </>
-            ) : (
-              <>
-                <Wand2 className="w-4 h-4 mr-2" />
-                生成题目
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
