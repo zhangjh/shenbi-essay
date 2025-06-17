@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertCircle, Lock } from 'lucide-react';
 
+const ADMIN_USER = import.meta.env.VITE_ADMIN_USER;
+const ADMIN_PWD = import.meta.env.VITE_ADMIN_PWD;
+
 interface AdminLoginProps {
   onLogin: () => void;
 }
@@ -23,7 +26,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
 
     // 模拟登录验证
     setTimeout(() => {
-      if (username === 'admin' && password === 'admin123456') {
+      if (username === ADMIN_USER && password === ADMIN_PWD) {
         onLogin();
       } else {
         setError('用户名或密码错误');
