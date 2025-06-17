@@ -13,12 +13,6 @@ interface EssayResponse {
   errorMsg?: string;
 }
 
-interface EssayGenerateResponse {
-  success: boolean;
-  data?: string[];
-  errorMsg?: string;
-}
-
 interface EssayAuditResponse {
   success: boolean;
   errorMsg?: string;
@@ -55,7 +49,7 @@ export const fetchEssayByTopic = async (topicId: string): Promise<EssayResponse>
 
 export const fetchEssayCountByTopic = async (topicId: string): Promise<EssayCountResponse> => {
   try {
-    const response = await fetch(`https://tx.zhangjh.cn/shenbi/essay/?topic_id=${topicId}`);
+    const response = await fetch(`${API_BASE_URL}/essay/?topic_id=${topicId}`);
     const data = await response.json();
     return data;
   } catch (error) {
@@ -67,7 +61,7 @@ export const fetchEssayCountByTopic = async (topicId: string): Promise<EssayCoun
   }
 };
 
-export const generateEssayBatch = async (topicIds: string[]): Promise<EssayGenerateResponse> => {
+export const generateEssayBatch = async (topicIds: string[]): Promise<string> => {
   try {
     const response = await fetch(`${API_BASE_URL}/essay/generateBatch`, {
       method: 'POST',
@@ -77,14 +71,11 @@ export const generateEssayBatch = async (topicIds: string[]): Promise<EssayGener
       body: JSON.stringify({ topicIds })
     });
     
-    const res = await response.json();
+    const res = await response.text();
     return res;
   } catch (error) {
     console.error('Failed to generate essays:', error);
-    return {
-      success: false,
-      errorMsg: '生成范文失败'
-    };
+    return '生成范文失败';
   }
 };
 

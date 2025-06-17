@@ -21,8 +21,6 @@ const EssayGenerator = () => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [showResultDialog, setShowResultDialog] = useState(false);
-  const [generatedEssayIds, setGeneratedEssayIds] = useState<string[]>([]);
   const pageSize = 10;
 
   useEffect(() => {
@@ -110,15 +108,15 @@ const EssayGenerator = () => {
     try {
       const result = await generateEssayBatch(selectedTopics);
       
-      if (result.success && result.data) {
-        setGeneratedEssayIds(result.data);
-        setShowResultDialog(true);
+      if (result) {
         setSelectedTopics([]);
-        toast.success(`成功生成 ${result.data.length} 篇范文`);
+        toast.success(`成功生成 ${selectedTopics.length} 篇范文`);
         // 重新加载题目列表以更新范文数量
-        loadTopics();
+        setTimeout(() => {
+          loadTopics();
+        }, 3000);
       } else {
-        toast.error(result.errorMsg || '生成失败，请重试');
+        toast.error('生成失败，请重试');
       }
     } catch (error) {
       toast.error('生成失败，请重试');
@@ -252,27 +250,6 @@ const EssayGenerator = () => {
           </CardContent>
         </Card>
       </div>
-
-      <Dialog open={showResultDialog} onOpenChange={setShowResultDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>范文生成成功</DialogTitle>
-            <DialogDescription>
-              成功生成 {generatedEssayIds.length} 篇范文
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2">
-            <p className="font-medium">生成的范文ID：</p>
-            <div className="space-y-1 max-h-60 overflow-y-auto">
-              {generatedEssayIds.map(id => (
-                <div key={id} className="text-sm bg-gray-100 p-2 rounded">
-                  {id}
-                </div>
-              ))}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 };
