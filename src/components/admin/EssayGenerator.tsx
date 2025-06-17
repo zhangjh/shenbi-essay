@@ -8,11 +8,16 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Loader2, FileText, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { searchEssayTopics, EssayTopic } from '@/services/topicService';
-import { generateEssayBatch } from '@/services/essayService';
+import { generateEssayBatch, fetchEssayCountByTopic } from '@/services/essayService';
+
+interface TopicWithEssayCount extends EssayTopic {
+  essayCount?: number;
+  countLoading?: boolean;
+}
 
 const EssayGenerator = () => {
   const [loading, setLoading] = useState(false);
-  const [topics, setTopics] = useState<EssayTopic[]>([]);
+  const [topics, setTopics] = useState<TopicWithEssayCount[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -30,10 +35,51 @@ const EssayGenerator = () => {
         page: currentPage, 
         pageSize 
       });
-      setTopics(result.data);
+      const topicsWithCount = result.data.map(topic => ({
+        ...topic,
+        essayCount: 0,
+        countLoading: true
+      }));
+      setTopics(topicsWithCount);
       setTotalPages(Math.ceil(result.total / pageSize));
+      
+      // 异步加载每个题目的范文数量
+      loadEssayCountsForTopics(topicsWithCount);
     } catch (error) {
       toast.error('加载题目失败');
+    }
+  };
+
+  const loadEssayCountsForTopics = async (topicsToLoad: TopicWithEssayCount[]) => {
+    for (const topic of topicsToLoad) {
+      try {
+        const countResult = await fetchEssayCountByTopic(topic.id);
+        if (countResult.success) {
+          setTopics(prevTopics => 
+            prevTopics.map(t => 
+              t.id === topic.id 
+                ? { ...t, essayCount: countResult.total || 0, countLoading: false }
+                : t
+            )
+          );
+        } else {
+          setTopics(prevTopics => 
+            prevTopics.map(t => 
+              t.id === topic.id 
+                ? { ...t, essayCount: 0, countLoading: false }
+                : t
+            )
+          );
+        }
+      } catch (error) {
+        setTopics(prevTopics => 
+          prevTopics.map(t => 
+            t.id === topic.id 
+              ? { ...t, essayCount: 0, countLoading: false }
+              : t
+          )
+        );
+      }
     }
   };
 
@@ -69,6 +115,8 @@ const EssayGenerator = () => {
         setShowResultDialog(true);
         setSelectedTopics([]);
         toast.success(`成功生成 ${result.data.length} 篇范文`);
+        // 重新加载题目列表以更新范文数量
+        loadTopics();
       } else {
         toast.error(result.errorMsg || '生成失败，请重试');
       }
@@ -127,6 +175,19 @@ const EssayGenerator = () => {
                         <Badge variant="outline" className="text-xs">
                           {topic.difficulty}
                         </Badge>
+                        {topic.countLoading ? (
+                          <Badge variant="outline" className="text-xs flex items-center space-x-1">
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            <span>统计中...</span>
+                          </Badge>
+                        ) : (
+                          <Badge 
+                            variant={topic.essayCount === 0 ? "destructive" : "default"} 
+                            className="text-xs"
+                          >
+                            已有范文: {topic.essayCount}篇
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <p className="text-sm text-gray-600">{topic.description}</p>

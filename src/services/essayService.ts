@@ -29,7 +29,17 @@ interface EssayShareResponse {
   errorMsg?: string;
 }
 
+interface EssayCountResponse {
+  success: boolean;
+  data?: Essay[];
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  errorMsg?: string;
+}
+
 const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
+
 export const fetchEssayByTopic = async (topicId: string): Promise<EssayResponse> => {
   try {
     const response = await fetch(`${API_BASE_URL}/essay/queryByTopic/${topicId}`);
@@ -39,6 +49,20 @@ export const fetchEssayByTopic = async (topicId: string): Promise<EssayResponse>
     return {
       success: false,
       errorMsg: '获取范文失败，请稍后重试'
+    };
+  }
+};
+
+export const fetchEssayCountByTopic = async (topicId: string): Promise<EssayCountResponse> => {
+  try {
+    const response = await fetch(`https://tx.zhangjh.cn/shenbi/essay/?topic_id=${topicId}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch essay count:', error);
+    return {
+      success: false,
+      errorMsg: '获取范文数量失败'
     };
   }
 };
