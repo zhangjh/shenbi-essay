@@ -1,12 +1,12 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import GradingResult from '@/components/GradingResult';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, Lock } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
@@ -158,7 +158,6 @@ const EssayGrading = () => {
       <Header />
 
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-
         {/* Header */}
         <div className="flex items-center mb-4 sm:mb-6">
           <Button
@@ -176,65 +175,84 @@ const EssayGrading = () => {
           </div>
         </div>
 
-        {!gradingResult ? (
+        <SignedOut>
           <Card className="shadow-lg">
-            <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 py-3 sm:py-4">
-              <CardTitle className="flex items-center text-base sm:text-lg">
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
-                <span>上传作文</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
-              {/* 题目上传（可选） */}
-              <div className="mb-5">
-                <div className="text-gray-600 text-sm mb-2 font-medium">（可选）上传作文题目文件</div>
-                <FileUpload
-                  onFileSelect={handleTopicUpload}
-                  selectedFile={topicFile}
-                />
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-8 h-8 text-blue-600" />
               </div>
-              {/* 作文上传（必填） */}
-              <div>
-                <div className="text-gray-800 text-sm mb-2 font-medium">上传作文文件（必填）</div>
-                <FileUpload
-                  onFileSelect={handleFileUpload}
-                  selectedFile={uploadedFile}
-                />
-              </div>
-
-              {/* 操作按钮 */}
-              <div className="flex flex-col sm:flex-row justify-between mt-4 sm:mt-6 gap-3 sm:gap-4">
-                <Button
-                  variant="outline"
-                  onClick={handleReset}
-                  disabled={!uploadedFile && !topicFile}
-                  size="sm"
-                  className="text-xs sm:text-sm w-full sm:w-auto order-2 sm:order-1"
-                >
-                  重新选择
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">请先登录</h3>
+              <p className="text-gray-600 mb-6">您需要登录后才能使用智能作文批改功能</p>
+              <SignInButton fallbackRedirectUrl="/grading">
+                <Button className="gradient-bg text-white px-6 py-2">
+                  立即登录
                 </Button>
-                <Button
-                  onClick={handleStartGrading}
-                  disabled={!uploadedFile || isAnalyzing}
-                  className="gradient-bg text-white text-xs sm:text-sm w-full sm:w-auto order-1 sm:order-2"
-                  size="sm"
-                >
-                  {isAnalyzing ? '正在批改中...' : '开始智能批改'}
-                </Button>
-              </div>
+              </SignInButton>
             </CardContent>
           </Card>
-        ) : (
-          <GradingResult
-            result={gradingResult}
-            onNewGrading={handleReset}
-            imageUrl={
-              uploadedFile && uploadedFile.type.startsWith('image/')
-                ? URL.createObjectURL(uploadedFile)
-                : undefined
-            }
-          />
-        )}
+        </SignedOut>
+
+        <SignedIn>
+          {!gradingResult ? (
+            <Card className="shadow-lg">
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 py-3 sm:py-4">
+                <CardTitle className="flex items-center text-base sm:text-lg">
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                  <span>上传作文</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+                {/* 题目上传（可选） */}
+                <div className="mb-5">
+                  <div className="text-gray-600 text-sm mb-2 font-medium">（可选）上传作文题目文件</div>
+                  <FileUpload
+                    onFileSelect={handleTopicUpload}
+                    selectedFile={topicFile}
+                  />
+                </div>
+                {/* 作文上传（必填） */}
+                <div>
+                  <div className="text-gray-800 text-sm mb-2 font-medium">上传作文文件（必填）</div>
+                  <FileUpload
+                    onFileSelect={handleFileUpload}
+                    selectedFile={uploadedFile}
+                  />
+                </div>
+
+                {/* 操作按钮 */}
+                <div className="flex flex-col sm:flex-row justify-between mt-4 sm:mt-6 gap-3 sm:gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleReset}
+                    disabled={!uploadedFile && !topicFile}
+                    size="sm"
+                    className="text-xs sm:text-sm w-full sm:w-auto order-2 sm:order-1"
+                  >
+                    重新选择
+                  </Button>
+                  <Button
+                    onClick={handleStartGrading}
+                    disabled={!uploadedFile || isAnalyzing}
+                    className="gradient-bg text-white text-xs sm:text-sm w-full sm:w-auto order-1 sm:order-2"
+                    size="sm"
+                  >
+                    {isAnalyzing ? '正在批改中...' : '开始智能批改'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <GradingResult
+              result={gradingResult}
+              onNewGrading={handleReset}
+              imageUrl={
+                uploadedFile && uploadedFile.type.startsWith('image/')
+                  ? URL.createObjectURL(uploadedFile)
+                  : undefined
+              }
+            />
+          )}
+        </SignedIn>
       </div>
     </div>
   );

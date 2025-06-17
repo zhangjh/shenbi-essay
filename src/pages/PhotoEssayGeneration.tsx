@@ -1,12 +1,12 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import PhotoEssayResult from '@/components/PhotoEssayResult';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Camera } from 'lucide-react';
+import { ArrowLeft, Camera, Lock } from 'lucide-react';
 import { generateEssayFromImage } from '@/services/photoEssayService';
 import { toast } from '@/components/ui/sonner';
 
@@ -96,54 +96,73 @@ const PhotoEssayGeneration = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        {!resultStream ? (
+        <SignedOut>
           <Card className="shadow-lg">
-            <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 py-3 sm:py-4">
-              <CardTitle className="flex items-center text-base sm:text-lg">
-                <Camera className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
-                <span>上传题目图片</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
-              <FileUpload 
-                onFileSelect={handleFileUpload}
-                selectedFile={uploadedFile}
-              />
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row justify-between mt-4 sm:mt-6 gap-3 sm:gap-4">
-                <Button 
-                  variant="outline" 
-                  onClick={handleReset}
-                  disabled={!uploadedFile}
-                  size="sm"
-                  className="text-xs sm:text-sm w-full sm:w-auto order-2 sm:order-1"
-                >
-                  重新选择
-                </Button>
-                <Button 
-                  onClick={handleStartGeneration}
-                  disabled={!uploadedFile || isGenerating}
-                  className="gradient-bg text-white text-xs sm:text-sm w-full sm:w-auto order-1 sm:order-2"
-                  size="sm"
-                >
-                  {isGenerating ? '正在生成中...' : '开始生成范文'}
-                </Button>
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-8 h-8 text-blue-600" />
               </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">请先登录</h3>
+              <p className="text-gray-600 mb-6">您需要登录后才能使用拍照生成范文功能</p>
+              <SignInButton fallbackRedirectUrl="/photo-essay">
+                <Button className="gradient-bg text-white px-6 py-2">
+                  立即登录
+                </Button>
+              </SignInButton>
             </CardContent>
           </Card>
-        ) : (
-          <PhotoEssayResult 
-            stream={resultStream}
-            onNewGeneration={handleReset}
-            imageUrl={
-              uploadedFile && uploadedFile.type.startsWith('image/')
-                ? URL.createObjectURL(uploadedFile)
-                : undefined
-            }
-          />
-        )}
+        </SignedOut>
+
+        <SignedIn>
+          {/* Main Content */}
+          {!resultStream ? (
+            <Card className="shadow-lg">
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6 py-3 sm:py-4">
+                <CardTitle className="flex items-center text-base sm:text-lg">
+                  <Camera className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                  <span>上传题目图片</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+                <FileUpload 
+                  onFileSelect={handleFileUpload}
+                  selectedFile={uploadedFile}
+                />
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row justify-between mt-4 sm:mt-6 gap-3 sm:gap-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleReset}
+                    disabled={!uploadedFile}
+                    size="sm"
+                    className="text-xs sm:text-sm w-full sm:w-auto order-2 sm:order-1"
+                  >
+                    重新选择
+                  </Button>
+                  <Button 
+                    onClick={handleStartGeneration}
+                    disabled={!uploadedFile || isGenerating}
+                    className="gradient-bg text-white text-xs sm:text-sm w-full sm:w-auto order-1 sm:order-2"
+                    size="sm"
+                  >
+                    {isGenerating ? '正在生成中...' : '开始生成范文'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <PhotoEssayResult 
+              stream={resultStream}
+              onNewGeneration={handleReset}
+              imageUrl={
+                uploadedFile && uploadedFile.type.startsWith('image/')
+                  ? URL.createObjectURL(uploadedFile)
+                  : undefined
+              }
+            />
+          )}
+        </SignedIn>
       </div>
     </div>
   );
