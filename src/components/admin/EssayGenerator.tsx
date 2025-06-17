@@ -1,14 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Loader2, FileText, CheckSquare } from 'lucide-react';
+import { Loader2, FileText, CheckSquare, Eye } from 'lucide-react'; //新增了Eye图标
 import { toast } from 'sonner';
 import { searchEssayTopics, EssayTopic } from '@/services/topicService';
-import { generateEssayBatch, fetchEssayCountByTopic } from '@/services/essayService';
+import { generateEssayBatch, fetchEssayCountByTopic, fetchEssayPreviewByTopic } from '@/services/essayService';
 
 interface TopicWithEssayCount extends EssayTopic {
   essayCount?: number;
@@ -21,6 +20,10 @@ const EssayGenerator = () => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewContent, setPreviewContent] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
+  const [previewLoading, setPreviewLoading] = useState(false);
   const pageSize = 10;
 
   useEffect(() => {
@@ -125,6 +128,32 @@ const EssayGenerator = () => {
     }
   };
 
+  const handleEssayPreview = async (topic: TopicWithEssayCount) => {
+    if (topic.essayCount === 0) {
+      toast.error('该题目暂无范文');
+      return;
+    }
+
+    setPreviewLoading(true);
+    setPreviewTitle(topic.title);
+    setShowPreviewDialog(true);
+    
+    try {
+      const result = await fetchEssayPreviewByTopic(topic.id);
+      if (result.success && result.data) {
+        setPreviewContent(result.data[0].essay);
+      } else {
+        setPreviewContent('获取范文内容失败');
+        toast.error(result.errorMsg || '获取范文失败');
+      }
+    } catch (error) {
+      setPreviewContent('获取范文内容失败');
+      toast.error('获取范文失败，请重试');
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
   return (
     <>
       <div className="space-y-6">
@@ -162,7 +191,22 @@ const EssayGenerator = () => {
                   />
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-gray-900">{topic.title}</h4>
+                      <div className="flex items-center space-x-2">
+                        <h4 
+                          className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                          onClick={() => handleEssayPreview(topic)}
+                          title="点击预览范文内容"
+                        >
+                          {topic.title}
+                        </h4>
+                        {topic.essayCount > 0 && (
+                          <Eye 
+                            className="w-4 h-4 text-blue-500 cursor-pointer hover:text-blue-700"
+                            onClick={() => handleEssayPreview(topic)}
+                            title="预览范文"
+                          />
+                        )}
+                      </div>
                       <div className="flex space-x-2">
                         <Badge variant="outline" className="text-xs">
                           {topic.grade}
@@ -250,6 +294,32 @@ const EssayGenerator = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* 追加预览范文dialog */}
+      <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>范文预览</DialogTitle>
+            <DialogDescription>
+              题目：{previewTitle}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {previewLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                <span>加载中...</span>
+              </div>
+            ) : (
+              <div className="prose max-w-none">
+                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  {previewContent}
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

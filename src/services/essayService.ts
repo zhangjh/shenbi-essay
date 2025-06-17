@@ -1,4 +1,3 @@
-
 interface Essay {
   id: string;
   title: string;
@@ -29,6 +28,12 @@ interface EssayCountResponse {
   total?: number;
   page?: number;
   pageSize?: number;
+  errorMsg?: string;
+}
+
+interface EssayPreviewResponse {
+  success: boolean;
+  data?: Essay[];
   errorMsg?: string;
 }
 
@@ -79,26 +84,19 @@ export const generateEssayBatch = async (topicIds: string[]): Promise<string> =>
   }
 };
 
-export const auditEssay = async (essayId: string): Promise<EssayAuditResponse> => {
+export const fetchEssayPreviewByTopic = async (topicId: string): Promise<EssayPreviewResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/essay/audit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ essayId })
-    });
-    
-    const res = await response.json();
-    return res;
+    const response = await fetch(`${API_BASE_URL}/essay/queryByTopic/${topicId}`);
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error('Failed to audit essay:', error);
+    console.error('Failed to fetch essay preview:', error);
     return {
       success: false,
-      errorMsg: '审核失败'
+      errorMsg: '获取范文预览失败'
     };
   }
-};
+}
 
 export const shareEssay = async (essayId: string): Promise<EssayShareResponse> => {
   try {
