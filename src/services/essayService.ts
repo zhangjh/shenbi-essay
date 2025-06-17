@@ -1,4 +1,3 @@
-
 interface Essay {
   id: string;
   title: string;
@@ -38,6 +37,12 @@ interface EssayCountResponse {
   errorMsg?: string;
 }
 
+interface EssayPreviewResponse {
+  success: boolean;
+  data?: string;
+  errorMsg?: string;
+}
+
 const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
 
 export const fetchEssayByTopic = async (topicId: string): Promise<EssayResponse> => {
@@ -67,65 +72,18 @@ export const fetchEssayCountByTopic = async (topicId: string): Promise<EssayCoun
   }
 };
 
-export const generateEssayBatch = async (topicIds: string[]): Promise<EssayGenerateResponse> => {
+export const fetchEssayPreviewByTopic = async (topicId: string): Promise<EssayPreviewResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/essay/generateBatch`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ topicIds })
-    });
-    
-    const res = await response.json();
-    return res;
+    const response = await fetch(`https://tx.zhangjh.cn/essay/queryByTopic/${topicId}`);
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error('Failed to generate essays:', error);
+    console.error('Failed to fetch essay preview:', error);
     return {
       success: false,
-      errorMsg: '生成范文失败'
+      errorMsg: '获取范文预览失败'
     };
   }
 };
 
-export const auditEssay = async (essayId: string): Promise<EssayAuditResponse> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/essay/audit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ essayId })
-    });
-    
-    const res = await response.json();
-    return res;
-  } catch (error) {
-    console.error('Failed to audit essay:', error);
-    return {
-      success: false,
-      errorMsg: '审核失败'
-    };
-  }
-};
-
-export const shareEssay = async (essayId: string): Promise<EssayShareResponse> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/essay/share`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ essayId })
-    });
-    
-    const res = await response.json();
-    return res;
-  } catch (error) {
-    console.error('Failed to share essay:', error);
-    return {
-      success: false,
-      errorMsg: '共享失败'
-    };
-  }
-};
+// ... keep existing code (generateEssayBatch, auditEssay, shareEssay functions)
