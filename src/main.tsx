@@ -5,6 +5,10 @@ import { zhCN } from "@clerk/localizations";
 import App from './App.tsx'
 import './index.css'
 
+console.log("--- Clerk Localization Diagnosis ---");
+console.log("Type of zhCN:", typeof zhCN);
+console.log("Content of zhCN:", JSON.stringify(zhCN, null, 2));
+
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_KEY;
 
 if (!PUBLISHABLE_KEY) {
