@@ -108,17 +108,13 @@ const Header = () => {
             <div className="border-t border-gray-200 py-4">
               <div className="flex flex-col space-y-2">
                 <SignedOut>
-                  <SignInButton fallbackRedirectUrl="/">
-                    <Button variant="outline" size="sm" className="w-full justify-start">
-                      <User className="w-4 h-4 mr-2" />
-                      登录
-                    </Button>
-                  </SignInButton>
-                  <SignUpButton fallbackRedirectUrl="/">
-                    <Button size="sm" className="gradient-bg text-white w-full">
-                      免费注册
-                    </Button>
-                  </SignUpButton>
+                  <Button variant="outline" size="sm" onClick={() => navigate("/signin")}>
+                    <User className="w-4 h-4 mr-2" />
+                    登录
+                  </Button>
+                  <Button size="sm" className="gradient-bg text-white" onClick={() => navigate("/signup")}>
+                    免费注册
+                  </Button>
                 </SignedOut>
               </div>
             </div>
