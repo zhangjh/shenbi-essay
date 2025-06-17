@@ -200,11 +200,12 @@ const EssayGenerator = () => {
                           {topic.title}
                         </h4>
                         {topic.essayCount > 0 && (
-                          <Eye 
-                            className="w-4 h-4 text-blue-500 cursor-pointer hover:text-blue-700"
-                            onClick={() => handleEssayPreview(topic)}
-                            title="预览范文"
-                          />
+                          <span title="预览范文">
+                            <Eye 
+                              className="w-4 h-4 text-blue-500 cursor-pointer hover:text-blue-700"
+                              onClick={() => handleEssayPreview(topic)}
+                            />
+                          </span>
                         )}
                       </div>
                       <div className="flex space-x-2">
