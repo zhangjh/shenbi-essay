@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { useUserSync } from '@/hooks/useUserSync';
 import Index from '@/pages/Index';
 import TopicAnalysis from '@/pages/TopicAnalysis';
 import Writing from '@/pages/Writing';
@@ -13,16 +12,18 @@ import PhotoEssayGeneration from '@/pages/PhotoEssayGeneration';
 import Admin from '@/pages/Admin';
 import NotFound from '@/pages/NotFound';
 import './App.css';
+import SignInPage from './pages/SignIn';
+import SignUpPage from './pages/SignUp';
 
 const queryClient = new QueryClient();
 
 function AppContent() {
-  useUserSync(); // 使用用户同步Hook
-
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="/topics" element={<TopicLibrary />} />
         <Route path="/topic/:id" element={<TopicAnalysis />} />
         <Route path="/topic/:id/write" element={<Writing />} />

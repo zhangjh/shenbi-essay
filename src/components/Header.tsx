@@ -47,17 +47,13 @@ const Header = () => {
           {/* User Actions */}
           <div className="flex items-center space-x-4">
             <SignedOut>
-              <SignInButton fallbackRedirectUrl="/">
-                <Button variant="outline" size="sm">
-                  <User className="w-4 h-4 mr-2" />
-                  登录
-                </Button>
-              </SignInButton>
-              <SignUpButton fallbackRedirectUrl="/">
-                <Button size="sm" className="gradient-bg text-white">
-                  免费注册
-                </Button>
-              </SignUpButton>
+              <Button variant="outline" size="sm" onClick={() => navigate("/signin")}>
+                <User className="w-4 h-4 mr-2" />
+                登录
+              </Button>
+              <Button size="sm" className="gradient-bg text-white" onClick={() => navigate("/signup")}>
+                免费注册
+              </Button>
             </SignedOut>
             <SignedIn>
               <UserButton 
