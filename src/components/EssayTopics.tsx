@@ -42,9 +42,9 @@ const EssayTopics = ({ selectedGrade }: EssayTopicsProps) => {
 
   // 获取年级对应的level参数
   const getGradeLevel = (grade: string) => {
-    if (grade === 'elementary') return [3, 4, 5, 6]; // 小学3-6年级
-    if (grade === 'middle') return [7, 8, 9]; // 初中7-9年级
-    if (grade === 'high') return [10, 11, 12]; // 高中10-12年级
+    if (grade === 'elementary') return [3, 4, 5, 6];
+    if (grade === 'middle') return [7];
+    if (grade === 'high') return [10];
     return [];
   };
 

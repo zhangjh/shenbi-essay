@@ -30,12 +30,9 @@ const TopicGenerator = () => {
     { value: '4', label: '四年级' },
     { value: '5', label: '五年级' },
     { value: '6', label: '六年级' },
-    { value: '7', label: '七年级' },
-    { value: '8', label: '八年级' },
-    { value: '9', label: '九年级' },
-    { value: '10', label: '高一' },
-    { value: '11', label: '高二' },
-    { value: '12', label: '高三' }
+    { value: '7', label: '初中' },
+    { value: '10', label: '高中' },
+    { value: '13', label: '高考真题' },
   ];
 
   const categoryOptions = [

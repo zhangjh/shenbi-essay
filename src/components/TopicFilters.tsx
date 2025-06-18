@@ -31,12 +31,9 @@ const gradeOptions = [
   { value: '4', label: '四年级' },
   { value: '5', label: '五年级' },
   { value: '6', label: '六年级' },
-  { value: '7', label: '七年级' },
-  { value: '8', label: '八年级' },
-  { value: '9', label: '九年级' },
-  { value: '10', label: '高一' },
-  { value: '11', label: '高二' },
-  { value: '12', label: '高三' },
+  { value: '7', label: '初中' },
+  { value: '10', label: '高中' },
+  { value: '13', label: '高考真题' },
 ];
 
 const categoryOptions = [
@@ -88,15 +85,22 @@ const importantOptions = [
   { value: '0', label: '普通题目' },
 ];
 
-const sourceOptions = [
+// 基础来源选项
+const baseSourceOptions = [
   { value: 'all', label: '全部来源' },
   { value: 'system', label: '系统生成' },
   { value: 'user', label: '用户共享' },
 ];
 
-const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFiltersProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+// 高考真题来源选项
+const gaokaoSourceOptions = [
+  { value: 'all', label: '全部来源' },
+  { value: 'gaokao1', label: '全国卷一' },
+  { value: 'gaokao2', label: '全国卷二' },
+  { value: 'gaokao', label: '其他高考卷' },
+];
 
+const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFiltersProps) => {
   // 获取当前可用的子分类选项
   const getAvailableSubCategories = () => {
     if (filters.category === undefined) {
@@ -114,6 +118,16 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
     // 如果分类改变，清空子分类
     if (key === 'category') {
       newFilters.sub_category = undefined;
+    }
+
+    // 如果年级改变为高考真题或从高考真题改变为其他，重置来源
+    if (key === 'level') {
+      const oldIsGaokao = filters.level === 13;
+      const newIsGaokao = value === 13;
+      
+      if (oldIsGaokao !== newIsGaokao) {
+        newFilters.source = '';
+      }
     }
 
     onFiltersChange(newFilters);
@@ -282,7 +296,7 @@ const TopicFilters = ({ filters, onFiltersChange, onSearch, onReset }: TopicFilt
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {sourceOptions.map((option) => (
+                  {(filters.level === 13 ? gaokaoSourceOptions : baseSourceOptions).map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
