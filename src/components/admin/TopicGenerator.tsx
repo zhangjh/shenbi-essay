@@ -123,6 +123,7 @@ const TopicGenerator = () => {
         ...(formData.category && { category: parseInt(formData.category) }),
         ...(formData.difficulty && { difficulty: parseInt(formData.difficulty) }),
         ...(formData.description && { description: formData.description }),
+        ...(formData.source && { source: formData.source }),
         ...(formData.tags.length > 0 && { tags: formData.tags }),
         count
       };
