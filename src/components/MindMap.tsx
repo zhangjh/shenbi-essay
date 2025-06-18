@@ -1,7 +1,5 @@
-
 import { useEffect, useRef } from 'react';
-import { Markmap } from 'markmap-view';
-import { Transformer } from 'markmap-lib';
+import type { Markmap } from 'markmap-view';
 
 interface MindMapProps {
   content: string;
@@ -9,32 +7,37 @@ interface MindMapProps {
 
 const MindMap = ({ content }: MindMapProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const mmRef = useRef<Markmap>();
+  const mmRef = useRef<Markmap | null>(null);
 
   useEffect(() => {
-    if (!svgRef.current || !content) return;
+    const renderMap = async () => {
+      if (!svgRef.current || !content) return;
 
-    // 创建 transformer 实例
-    const transformer = new Transformer();
-    
-    // 将 markdown 转换为 markmap 数据
-    const { root } = transformer.transform(content);
-    
-    // 如果已经有 markmap 实例，更新数据
-    if (mmRef.current) {
-      mmRef.current.setData(root);
-      mmRef.current.fit();
-    } else {
-      // 创建新的 markmap 实例
-      mmRef.current = Markmap.create(svgRef.current, {
-        maxWidth: 300,
-        spacingVertical: 5,
-        spacingHorizontal: 80,
-        autoFit: true,
-        pan: true,
-        zoom: true,
-      }, root);
-    }
+      const { Transformer } = await import('markmap-lib');
+      const { Markmap } = await import('markmap-view');
+      
+      const transformer = new Transformer();
+      const { root } = transformer.transform(content);
+      
+      if (mmRef.current) {
+        mmRef.current.setData(root);
+        mmRef.current.fit();
+      } else {
+        mmRef.current = Markmap.create(svgRef.current, {
+          maxWidth: 300,
+          spacingVertical: 5,
+          spacingHorizontal: 80,
+          autoFit: true,
+          pan: true,
+          zoom: true,
+        }, root);
+      }
+    };
+    renderMap();
+
+    return () => {
+      mmRef.current?.destroy();
+    };
   }, [content]);
 
   if (!content) {

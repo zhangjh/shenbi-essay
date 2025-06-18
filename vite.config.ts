@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -20,9 +19,6 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: [
-      'markmap-lib',
-      'markmap-view',
-      'markmap-common'
     ]
   },
   build: {
@@ -40,8 +36,6 @@ export default defineConfig(({ mode }) => ({
           'utils-vendor': ['@tanstack/react-query', 'clsx', 'class-variance-authority', 'tailwind-merge'],
           // 将图标和markdown相关的库分离出来
           'content-vendor': ['lucide-react', 'react-markdown', 'remark-gfm', 'rehype-raw'],
-          // 将markmap相关的库分离出来
-          'markmap-vendor': ['markmap-lib', 'markmap-view', 'markmap-common']
         }
       }
     },

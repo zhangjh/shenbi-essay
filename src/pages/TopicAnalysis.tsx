@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,7 @@ import { fetchTopicById, EssayTopic } from '@/services/topicService';
 import { fetchEssayByTopic } from '@/services/essayService';
 import Header from '@/components/Header';
 import WritingGuide from '@/components/WritingGuide';
-import MindMap from '@/components/MindMap';
+const MindMap = lazy(() => import('@/components/MindMap'));
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -247,7 +247,9 @@ const TopicAnalysis = () => {
               </CardHeader>
               <CardContent>
                 {topic.mind ? (
-                  <MindMap content={topic.mind} />
+                  <Suspense fallback={<div>加载中...</div>}>
+                    <MindMap content={topic.mind} />
+                  </Suspense>
                 ) : (
                   <p className="text-gray-500 text-center py-8">暂无思维导图内容</p>
                 )}

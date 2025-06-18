@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, BookOpen, Save, Eye, PenTool, Target, Lightbulb, Brain } from 'lucide-react';
 import { fetchTopicById, EssayTopic } from '@/services/topicService';
 import Header from '@/components/Header';
