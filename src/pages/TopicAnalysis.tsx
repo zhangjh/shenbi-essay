@@ -163,7 +163,7 @@ const TopicAnalysis = () => {
         <div className="flex justify-start mb-6">
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/topics')}
             className="text-gray-600 hover:text-gray-800"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
