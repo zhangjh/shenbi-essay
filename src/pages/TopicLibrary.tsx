@@ -10,6 +10,7 @@ import { searchEssayTopics, EssayTopic } from '@/services/topicService';
 import TopicFilters, { FilterState } from '@/components/TopicFilters';
 import Header from '@/components/Header';
 import SEO from '@/components/SEO';
+import { getSourceLabel } from '@/utils/constants';
 
 const TopicLibrary = () => {
   const navigate = useNavigate();
@@ -149,6 +150,8 @@ const TopicLibrary = () => {
       default: return <BookOpen className="w-4 h-4" />;
     }
   };
+  
+  // Using getSourceLabel from constants
 
   const totalPages = data ? Math.ceil(data.total / pageSize) : 0;
 
@@ -246,7 +249,7 @@ const TopicLibrary = () => {
                         <div className="flex items-center space-x-2">
                           <Badge variant="secondary">{topic.grade}</Badge>
                           <Badge variant="outline" className="text-xs">
-                            {topic.source === 'system' ? '系统生成' : '用户共享'}
+                            {getSourceLabel(topic.source)}
                           </Badge>
                         </div>
                       </CardHeader>
@@ -254,16 +257,15 @@ const TopicLibrary = () => {
                         <CardDescription className="mb-3 leading-relaxed line-clamp-3">
                           {topic.description}
                         </CardDescription>
-                        {topic.tags && topic.tags.length > 0 && (
+                        {topic.tags && (
                           <div className="flex flex-wrap gap-1">
-                            {topic.tags.slice(0, 3).map((tag) => (
+                            {(topic.tags).slice(0, 3).map((tag) => (
                               <Badge key={tag} variant="outline" className="text-xs">
                                 {tag}
                               </Badge>
                             ))}
-                            {topic.tags.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{topic.tags.length - 3}
+                            {(topic.tags.length) > 3 && (
+                              <Badge variant="outline" className="text-xs">+{(topic.tags.length) - 3}
                               </Badge>
                             )}
                           </div>

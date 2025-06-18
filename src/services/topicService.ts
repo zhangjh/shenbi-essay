@@ -6,7 +6,7 @@ export interface ApiEssayTopic {
   category: number; // 0-6 表示不同类型
   sub_category: number; // 子分类
   description: string;
-  tags: string[];
+  tags: string; // 逗号分隔的字符串
   guide?: string; // 写作指导
   mind?: string; // markdown形式的脑图数据
   source: string; // 来源：system 或其他
@@ -48,7 +48,7 @@ export interface TopicGenerateParams {
   category?: number;
   difficulty?: number;
   description?: string;
-  tags?: string[];
+  tags?: string;
   source?: string;
   count: number;
 }
@@ -69,7 +69,6 @@ export interface TopicGenerateResponse {
 }
 
 const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
-// const API_BASE_URL = 'https://tx.zhangjh.cn/shenbi';
 
 // 映射函数
 const mapLevelToGrade = (level: number): string => {
@@ -100,6 +99,12 @@ const mapCategoryToType = (category: number): string => {
 };
 
 const transformApiDataToEssayTopic = (apiData: ApiEssayTopic): EssayTopic => {
+  // Handle tags that might come as a string instead of an array
+  let tags = [];
+  if (typeof apiData.tags === 'string') {
+    tags = apiData.tags.split(',').filter(tag => tag.trim() !== '');
+  }
+
   return {
     id: apiData.id,
     title: apiData.title,
@@ -107,7 +112,7 @@ const transformApiDataToEssayTopic = (apiData: ApiEssayTopic): EssayTopic => {
     grade: mapLevelToGrade(apiData.level),
     difficulty: mapDifficultyToText(apiData.difficulty),
     description: apiData.description,
-    tags: apiData.tags || [],
+    tags: tags,
     guide: apiData.guide,
     mind: apiData.mind,
     source: apiData.source,
