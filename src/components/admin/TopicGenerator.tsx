@@ -20,6 +20,8 @@ const TopicGenerator = () => {
     level: '',
     category: '',
     difficulty: '',
+    description: '',
+    source: '',
     tags: [] as string[],
     count: '1'
   });
@@ -47,6 +49,43 @@ const TopicGenerator = () => {
     { value: '0', label: '简单' },
     { value: '1', label: '中等' },
     { value: '2', label: '困难' }
+  ];
+
+  const sourceOptions = [
+    { value: 'gaokao1', label: '全国卷I' },
+    { value: 'gaokao2', label: '全国卷II' },
+    { value: 'quanguo3', label: '全国卷III' },
+    { value: 'gaokao', label: '全国卷' },
+    { value: 'quanguojia', label: '全国甲卷' },
+    { value: 'quanguoyi', label: '全国乙卷' },
+    { value: 'xinkb', label: '新课标卷' },
+    { value: 'quanguoxinkb1', label: '全国新课标I卷' },
+    { value: 'quanguoxinkb2', label: '全国新课标II卷' },
+    { value: 'quanguoxingk1', label: '全国新高考I卷' },
+    { value: 'quanguoxingk2', label: '全国新高考II卷' },
+    { value: 'beijing', label: '北京卷' },
+    { value: 'tianjin', label: '天津卷' },
+    { value: 'shanghai', label: '上海卷' },
+    { value: 'zhejiang', label: '浙江卷' },
+    { value: 'jiangsu', label: '江苏卷' },
+    { value: 'shandong', label: '山东卷' },
+    { value: 'fujian', label: '福建卷' },
+    { value: 'hubei', label: '湖北卷' },
+    { value: 'chongqing', label: '重庆卷' },
+    { value: 'henan', label: '河南卷' },
+    { value: 'hunan', label: '湖南卷' },
+    { value: 'anhui', label: '安徽卷' },
+    { value: 'sichuan', label: '四川卷' },
+    { value: 'guangdong', label: '广东卷' },
+    { value: 'liaoning', label: '辽宁卷' },
+    { value: 'jiangxi', label: '江西卷' },
+    { value: 'hainan', label: '海南卷' },
+    { value: 'shaanxi', label: '陕西卷' },
+    { value: 'guangxi', label: '广西卷' },
+    { value: 'hebei', label: '河北卷' },
+    { value: 'ningxia', label: '宁夏卷' },
+    { value: 'xinjiang', label: '新疆卷' },
+    { value: 'heilongjiang', label: '黑龙江卷' }
   ];
 
   const addTag = () => {
@@ -83,6 +122,8 @@ const TopicGenerator = () => {
         ...(formData.level && { level: parseInt(formData.level) }),
         ...(formData.category && { category: parseInt(formData.category) }),
         ...(formData.difficulty && { difficulty: parseInt(formData.difficulty) }),
+        ...(formData.description && { description: formData.description }),
+        ...(formData.tags.length > 0 && { tags: formData.tags }),
         count
       };
 
@@ -99,6 +140,8 @@ const TopicGenerator = () => {
           level: '',
           category: '',
           difficulty: '',
+          description: '',
+          source: '',
           tags: [],
           count: '1'
         });
@@ -200,6 +243,24 @@ const TopicGenerator = () => {
                   placeholder="输入生成数量(1-50)"
                 />
               </div>
+
+              {formData.level === '13' && (
+                <div className="space-y-2">
+                  <Label htmlFor="source">试卷来源（可选）</Label>
+                  <Select value={formData.source} onValueChange={(value) => setFormData(prev => ({ ...prev, source: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="选择试卷来源" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sourceOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -208,6 +269,8 @@ const TopicGenerator = () => {
                 id="description"
                 placeholder="请输入题目描述和要求"
                 rows={4}
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               />
             </div>
 

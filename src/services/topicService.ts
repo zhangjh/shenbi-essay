@@ -47,6 +47,9 @@ export interface TopicGenerateParams {
   level?: number;
   category?: number;
   difficulty?: number;
+  description?: string;
+  tags?: string[];
+  source?: string;
   count: number;
 }
 
