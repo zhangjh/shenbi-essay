@@ -24,7 +24,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/signin" element={<SignInPage />} />
-        <Route path="/signup/*" element={<SignUpPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="/topics" element={<TopicLibrary />} />
         <Route path="/topic/:id" element={<TopicAnalysis />} />
         <Route path="/topic/:id/write" element={<Writing />} />
