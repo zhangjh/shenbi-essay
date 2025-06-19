@@ -108,16 +108,23 @@ const EssayGenerator = () => {
     }
 
     setLoading(true);
+    const topicCount = selectedTopics.length;
+    
     try {
+      // 显示开始生成的提示
+      toast.info(`开始生成 ${topicCount} 篇范文，请稍候...`);
+      
+      // 开始生成范文，服务端会确保所有任务完成后才返回
       const result = await generateEssayBatch(selectedTopics);
       
-      if (result) {
+      // 检查返回结果是否表示成功
+      if (result && result !== '生成范文失败') {
+        // 清空选中状态
         setSelectedTopics([]);
-        toast.success(`成功生成 ${selectedTopics.length} 篇范文`);
+        toast.success(`成功生成 ${topicCount} 篇范文`);
+        
         // 重新加载题目列表以更新范文数量
-        setTimeout(() => {
-          loadTopics();
-        }, 3000);
+        loadTopics();
       } else {
         toast.error('生成失败，请重试');
       }
