@@ -12,11 +12,6 @@ interface EssayResponse {
   errorMsg?: string;
 }
 
-interface EssayAuditResponse {
-  success: boolean;
-  errorMsg?: string;
-}
-
 interface EssayShareResponse {
   success: boolean;
   errorMsg?: string;

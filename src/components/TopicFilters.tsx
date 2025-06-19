@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Filter, X } from 'lucide-react';
 
 export interface FilterState {
   title: string;

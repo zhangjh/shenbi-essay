@@ -6,9 +6,7 @@ import { Search, User, Menu } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   SignedIn, 
-  SignedOut, 
-  SignInButton, 
-  SignUpButton, 
+  SignedOut,
   UserButton 
 } from "@clerk/clerk-react";
 

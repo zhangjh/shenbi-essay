@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Users, FileText, Edit, Camera } from 'lucide-react';
+import { BookOpen, FileText, Edit, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {

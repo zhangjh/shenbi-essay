@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import GradingResult from '@/components/GradingResult';
@@ -183,11 +183,12 @@ const EssayGrading = () => {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">请先登录</h3>
               <p className="text-gray-600 mb-6">您需要登录后才能使用智能作文批改功能</p>
-              <SignInButton fallbackRedirectUrl="/grading">
-                <Button className="gradient-bg text-white px-6 py-2">
-                  立即登录
-                </Button>
-              </SignInButton>
+              <Button 
+                className="gradient-bg text-white px-6 py-2"
+                onClick={() => navigate("/signin?redirect_url=/grading")}
+              >
+                立即登录
+              </Button>
             </CardContent>
           </Card>
         </SignedOut>

@@ -1,5 +1,3 @@
-
-import React from 'react';
 import { Maximize } from 'lucide-react';
 
 interface ImagePreviewCardProps {

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ImageFullscreenPreview from './ImageFullscreenPreview';
 import ImagePreviewCard from './ImagePreviewCard';
 import MarkdownResult from './MarkdownResult';

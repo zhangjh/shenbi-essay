@@ -1,6 +1,3 @@
-
-import React from 'react';
-
 interface ImageFullscreenPreviewProps {
   src: string;
   alt?: string;

@@ -7,7 +7,7 @@ import GradeSelector from '@/components/GradeSelector';
 import EssayTopics from '@/components/EssayTopics';
 import FeatureCard from '@/components/FeatureCard';
 import SEO from '@/components/SEO';
-import { BookOpen, Search, Camera, Upload, Edit } from 'lucide-react';
+import { Search, Camera, Edit } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
