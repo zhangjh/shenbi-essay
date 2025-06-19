@@ -11,6 +11,8 @@ import TopicFilters, { FilterState } from '@/components/TopicFilters';
 import Header from '@/components/Header';
 import SEO from '@/components/SEO';
 import { getSourceLabel } from '@/utils/constants';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const TopicLibrary = () => {
   const navigate = useNavigate();
@@ -254,9 +256,11 @@ const TopicLibrary = () => {
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <CardDescription className="mb-3 leading-relaxed line-clamp-3">
-                          {topic.description}
-                        </CardDescription>
+                        <div className="prose prose-sm max-w-none mb-3 leading-relaxed line-clamp-3">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {topic.description}
+                          </ReactMarkdown>
+                        </div>
                         {topic.tags && (
                           <div className="flex flex-wrap gap-1">
                             {(topic.tags).slice(0, 3).map((tag) => (

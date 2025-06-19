@@ -187,9 +187,11 @@ const TopicAnalysis = () => {
               </div>
             </div>
             <CardTitle className="text-2xl md:text-3xl">{topic.title}</CardTitle>
-            <CardDescription className="text-base leading-relaxed mt-4 text-left">
-              {topic.description}
-            </CardDescription>
+            <div className="prose prose-sm max-w-none mt-4 text-left">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {topic.description}
+              </ReactMarkdown>
+            </div>
             <div className="flex flex-wrap gap-2 mt-4">
               {topic.tags.map((tag) => (
                 <Badge key={tag} variant="outline" className="text-sm">
