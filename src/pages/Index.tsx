@@ -61,14 +61,14 @@ const Index = () => {
         <HeroSection />
 
         {/* Main Features Section */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">核心功能</h2>
+        <section className="py-12 md:py-16">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2 md:mb-4">核心功能</h2>
               <p className="text-gray-600 text-lg">全方位的作文学习支持，让写作更轻松</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
               {mainFeatures.map((feature, index) => (
                 <FeatureCard key={index} {...feature} />
               ))}
@@ -77,10 +77,10 @@ const Index = () => {
         </section>
 
         {/* Grade Selection Section */}
-        <section className="py-16 bg-white/50 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">选择年级段</h2>
+        <section className="py-12 md:py-16 bg-white/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2 md:mb-4">选择年级段</h2>
               <p className="text-gray-600 text-lg">不同年级，不同要求，个性化学习更有效</p>
             </div>
             
@@ -92,15 +92,15 @@ const Index = () => {
         </section>
 
         {/* Essay Topics Section */}
-        <section className="py-20 bg-white/50 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 md:py-20 bg-white/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <EssayTopics selectedGrade={selectedGrade} />
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-800 text-white py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <footer className="bg-gray-800 text-white py-8 md:py-12">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             {/* Desktop: 4 columns, Mobile: 2 columns */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {/* Logo and description - spans 2 columns on mobile */}

@@ -1,0 +1,45 @@
+/* 移动端响应式样式优化 */
+
+/* 在小屏幕上减少容器的边距 */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  /* 减少卡片的内边距 */
+  .card-content {
+    padding: 0.75rem !important;
+  }
+  
+  /* 调整按钮大小 */
+  .btn-mobile {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 减少段落和标题的边距 */
+  h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  p {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* 调整网格间距 */
+  .grid {
+    gap: 0.75rem !important;
+  }
+}
+
+/* 确保内容不会溢出屏幕 */
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+/* 确保图片和媒体内容响应式 */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}

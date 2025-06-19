@@ -12,6 +12,7 @@ import PhotoEssayGeneration from '@/pages/PhotoEssayGeneration';
 import Admin from '@/pages/Admin';
 import NotFound from '@/pages/NotFound';
 import './App.css';
+import './mobile.css';
 import SignInPage from './pages/SignIn';
 import SignUpPage from './pages/SignUp';
 
@@ -40,8 +41,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <AppContent />
+        <div className="overflow-x-hidden">
+          <Toaster />
+          <AppContent />
+        </div>
       </TooltipProvider>
     </QueryClientProvider>
   );
