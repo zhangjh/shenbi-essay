@@ -50,7 +50,7 @@ const HeroSection = () => {
           </h2>
           <p className="text-base md:text-xl text-gray-600 max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed px-1">
             专为中小学生打造的作文学习平台，提供全方位的写作指导与练习，
-            从题目解析到范文学习，从智能批改到个性指导，助力每一位学生提升写作水平。
+            从题目解析到范文学习，从智能批改到拍照生成，助力每一位学生提升写作水平。
           </p>
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
             <Button 

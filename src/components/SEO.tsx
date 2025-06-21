@@ -12,7 +12,7 @@ interface SEOProps {
 
 const SEO = ({
   title = "神笔作文（ShenBi-Essay）- 让每个学生都能写出优秀的作文",
-  description = "神笔作文是专为中小学生打造的作文学习平台，提供智能批改、题目解析、范文学习、个性化指导等功能，助力学生提升写作水平。",
+  description = "神笔作文是专为中小学生打造的作文学习平台，提供智能批改、题目解析、范文学习、拍照生成范文等功能，助力学生提升写作水平。",
   keywords = "作文学习,作文批改,作文题目,小学作文,初中作文,高中作文,智能批改,写作指导,作文范文",
   canonical,
   ogImage = "/assets/logo.png",
