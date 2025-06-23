@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 
 // 配置
 const API_BASE_URL = process.env.VITE_BIZ_DOMAIN || 'https://tx.zhangjh.cn';
-const SITE_URL = 'https://shenbi.zhangjh.cn';
+const SITE_URL = 'https://shenbi.tech';
 const SITEMAP_PATH = path.join(__dirname, '../public/sitemap.xml');
 const CURRENT_DATE = new Date().toISOString().split('T')[0];
 

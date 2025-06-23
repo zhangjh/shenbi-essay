@@ -31,4 +31,4 @@
 ### 注意事项
 
 - 确保环境变量 `VITE_BIZ_DOMAIN` 已正确设置，否则脚本将使用默认值 `https://tx.zhangjh.cn`
-- 生成的 sitemap.xml 中的 URL 基础路径为 `https://shenbi.zhangjh.cn`，如需修改请编辑脚本中的 `SITE_URL` 变量
+- 生成的 sitemap.xml 中的 URL 基础路径为 `https://shenbi.tech`，如需修改请编辑脚本中的 `SITE_URL` 变量
