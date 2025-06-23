@@ -1,24 +1,41 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SignedIn, SignedOut } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, useUser } from '@clerk/clerk-react';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import PhotoEssayResult from '@/components/PhotoEssayResult';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Camera, Lock } from 'lucide-react';
-import { generateEssayFromImage } from '@/services/photoEssayService';
+import { generateEssayFromImage, generateTopicFromImage } from '@/services/photoEssayService';
 import { toast } from '@/components/ui/sonner';
 
 const PhotoEssayGeneration = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [resultStream, setResultStream] = useState<ReadableStream | null>(null);
-
-  const handleFileUpload = (file: File) => {
+  const [topic, setTopic] = useState<string | null>(null);
+  const handleFileUpload = async (file: File) => {
+    // 只支持图片文件
+    if (!file.type.startsWith('image/')) {
+      toast.error('仅支持图片文件', {
+        description: '请上传JPG、PNG等图片格式的题目图片'
+      });
+      return;
+    }
     setUploadedFile(file);
     console.log('File uploaded:', file.name);
+    setIsUploading(true);
+    // 调用后端识别内容后生成题目
+    const base64Data = await convertFileToBase64(file);
+    console.log('Starting essay generation from image...');
+    const topic = await generateTopicFromImage(base64Data);
+    console.log('Topic generated:', topic);
+    setIsUploading(false);
+    setTopic(topic);
   };
 
   const convertFileToBase64 = (file: File): Promise<string> => {
@@ -36,23 +53,10 @@ const PhotoEssayGeneration = () => {
   };
 
   const handleStartGeneration = async () => {
-    if (!uploadedFile) return;
-    
-    // 只支持图片文件
-    if (!uploadedFile.type.startsWith('image/')) {
-      toast.error('仅支持图片文件', {
-        description: '请上传JPG、PNG等图片格式的题目图片'
-      });
-      return;
-    }
-    
+    if (!topic) return;
     setIsGenerating(true);
-    
     try {
-      const base64Data = await convertFileToBase64(uploadedFile);
-      console.log('Starting essay generation from image...');
-
-      const stream = await generateEssayFromImage(base64Data);
+      const stream = await generateEssayFromImage(topic, user?.id || '');
       setResultStream(stream);
       
       toast.success('开始生成范文', {
@@ -131,6 +135,7 @@ const PhotoEssayGeneration = () => {
                 />
 
                 {/* Action Buttons */}
+                {!isUploading && 
                 <div className="flex flex-col sm:flex-row justify-between mt-4 sm:mt-6 gap-3 sm:gap-4">
                   <Button 
                     variant="outline" 
@@ -150,6 +155,7 @@ const PhotoEssayGeneration = () => {
                     {isGenerating ? '正在生成中...' : '开始生成范文'}
                   </Button>
                 </div>
+                }
               </CardContent>
             </Card>
           ) : (
