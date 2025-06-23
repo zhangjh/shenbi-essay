@@ -20,7 +20,6 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl, topic }: PhotoEss
   const [isComplete, setIsComplete] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [wantToShare, setWantToShare] = useState(false);
-  const [essayId, setEssayId] = useState<string | null>(null);
 
   useEffect(() => {
     const readStream = async () => {
@@ -33,9 +32,6 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl, topic }: PhotoEss
           
           if (done) {
             setIsComplete(true);
-            // 根据topic获取essayId
-            const res = await fetchEssayByTopic(topic);
-            setEssayId(res.data?.[0].id);
             break;
           }
 
@@ -52,6 +48,11 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl, topic }: PhotoEss
   }, [stream]);
 
   const handleShare = async () => {
+    setIsSharing(true);
+
+    // 根据topic获取essayId
+    const res = await fetchEssayByTopic(topic);
+    const essayId = res.data?.[0].id;
     if (!essayId) {
       toast.error('无法共享', {
         description: '范文ID不存在'
@@ -59,7 +60,6 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl, topic }: PhotoEss
       return;
     }
 
-    setIsSharing(true);
     try {
       const result = await shareEssay(essayId);
       if (result.success) {
