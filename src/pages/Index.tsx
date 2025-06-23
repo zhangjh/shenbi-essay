@@ -132,7 +132,7 @@ const Index = () => {
                   <li>小学作文</li>
                   <li>初中作文</li>
                   <li>高中作文</li>
-                  <li>专项训练</li>
+                  <li>高考真题</li>
                 </ul>
               </div>
               
