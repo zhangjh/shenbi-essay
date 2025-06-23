@@ -257,9 +257,10 @@ const TopicLibrary = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="prose prose-sm max-w-none mb-3 leading-relaxed line-clamp-3">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {/* 列表页不使用markdown */}
+                          {/* <ReactMarkdown remarkPlugins={[remarkGfm]}> */}
                             {topic.description}
-                          </ReactMarkdown>
+                          {/* </ReactMarkdown> */}
                         </div>
                         {topic.tags && (
                           <div className="flex flex-wrap gap-1">
