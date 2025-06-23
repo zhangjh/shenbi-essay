@@ -15,8 +15,8 @@ export const generateTopicFromImage = async (imageBase64: string): Promise<strin
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  const data = await response.json();
-  return data.topic;
+  const res = await response.json();
+  return res.data;
 };
 
 export const generateEssayFromImage = async (topic: string, userId: string): Promise<ReadableStream> => {
@@ -27,7 +27,6 @@ export const generateEssayFromImage = async (topic: string, userId: string): Pro
     },
     body: JSON.stringify({
       userId: userId,
-      shared: 1
     })
   });
 

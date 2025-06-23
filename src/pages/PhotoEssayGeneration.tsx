@@ -53,7 +53,12 @@ const PhotoEssayGeneration = () => {
   };
 
   const handleStartGeneration = async () => {
-    if (!topic) return;
+    if (!topic) {
+      toast.error('生成失败', {
+        description: '题目识别失败'
+      });
+      return;
+    }
     setIsGenerating(true);
     try {
       const stream = await generateEssayFromImage(topic, user?.id || '');
@@ -167,6 +172,7 @@ const PhotoEssayGeneration = () => {
                   ? URL.createObjectURL(uploadedFile)
                   : undefined
               }
+              topic={topic}
             />
           )}
         </SignedIn>

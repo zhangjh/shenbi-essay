@@ -5,16 +5,17 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { FileText, RotateCcw, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { shareEssay } from '@/services/essayService';
+import { fetchEssayByTopic, shareEssay } from '@/services/essayService';
 import { toast } from '@/components/ui/sonner';
 
 interface PhotoEssayResultProps {
   stream: ReadableStream;
   onNewGeneration: () => void;
   imageUrl?: string;
+  topic: string;
 }
 
-const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl }: PhotoEssayResultProps) => {
+const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl, topic }: PhotoEssayResultProps) => {
   const [content, setContent] = useState('');
   const [isComplete, setIsComplete] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
@@ -32,8 +33,9 @@ const PhotoEssayResult = ({ stream, onNewGeneration, imageUrl }: PhotoEssayResul
           
           if (done) {
             setIsComplete(true);
-            // 生成完成后，可以从后端获取essayId（这里模拟生成一个ID）
-            setEssayId(`essay_${Date.now()}`);
+            // 根据topic获取essayId
+            const res = await fetchEssayByTopic(topic);
+            setEssayId(res.data?.[0].id);
             break;
           }
 

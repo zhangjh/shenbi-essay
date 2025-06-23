@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Loader2, FileText, CheckSquare, Eye } from 'lucide-react'; //新增了Eye图标
 import { toast } from 'sonner';
 import { searchEssayTopics, EssayTopic } from '@/services/topicService';
-import { generateEssayBatch, fetchEssayCountByTopic, fetchEssayPreviewByTopic } from '@/services/essayService';
+import { generateEssayBatch, fetchEssayCountByTopic, fetchEssayByTopic } from '@/services/essayService';
 
 interface TopicWithEssayCount extends EssayTopic {
   essayCount?: number;
@@ -146,7 +146,7 @@ const EssayGenerator = () => {
     setShowPreviewDialog(true);
     
     try {
-      const result = await fetchEssayPreviewByTopic(topic.id);
+      const result = await fetchEssayByTopic(topic.id);
       if (result.success && result.data) {
         setPreviewContent(result.data[0].essay);
       } else {

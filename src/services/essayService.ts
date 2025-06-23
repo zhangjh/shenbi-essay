@@ -26,12 +26,6 @@ interface EssayCountResponse {
   errorMsg?: string;
 }
 
-interface EssayPreviewResponse {
-  success: boolean;
-  data?: Essay[];
-  errorMsg?: string;
-}
-
 const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
 
 export const fetchEssayByTopic = async (topicId: string): Promise<EssayResponse> => {
@@ -78,20 +72,6 @@ export const generateEssayBatch = async (topicIds: string[]): Promise<string> =>
     return '生成范文失败';
   }
 };
-
-export const fetchEssayPreviewByTopic = async (topicId: string): Promise<EssayPreviewResponse> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/essay/queryByTopic/${topicId}`);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Failed to fetch essay preview:', error);
-    return {
-      success: false,
-      errorMsg: '获取范文预览失败'
-    };
-  }
-}
 
 export const shareEssay = async (essayId: string): Promise<EssayShareResponse> => {
   try {
