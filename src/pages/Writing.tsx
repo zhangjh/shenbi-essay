@@ -126,6 +126,11 @@ const Writing = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
       <Header />
       
+      {/* SEO H1 */}
+      <section className="sr-only">
+        <h1>{topic?.title} - 在线写作编辑器</h1>
+      </section>
+      
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 返回按钮和标题 */}
         <div className="flex items-center justify-between mb-6">

@@ -158,6 +158,11 @@ const TopicAnalysis = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
       <Header />
       
+      {/* SEO H1 */}
+      <section className="sr-only">
+        <h1>{topic?.title} - 作文题目解析与写作指导</h1>
+      </section>
+      
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 返回按钮 */}
         <div className="flex justify-start mb-6">

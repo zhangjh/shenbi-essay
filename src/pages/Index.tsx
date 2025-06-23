@@ -60,6 +60,11 @@ const Index = () => {
 
         <HeroSection />
 
+        {/* Main H1 for SEO */}
+        <section className="sr-only">
+          <h1>神笔作文 - 中小学生作文学习平台，提供智能批改、题目解析和写作指导</h1>
+        </section>
+
         {/* Main Features Section */}
         <section className="py-12 md:py-16">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
