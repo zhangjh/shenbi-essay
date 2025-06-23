@@ -6,7 +6,7 @@ import FileUpload from '@/components/FileUpload';
 import PhotoEssayResult from '@/components/PhotoEssayResult';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Camera, Lock } from 'lucide-react';
+import { ArrowLeft, Camera, Lock, Loader2 } from 'lucide-react';
 import { generateEssayFromImage, generateTopicFromImage } from '@/services/photoEssayService';
 import { toast } from '@/components/ui/sonner';
 
@@ -29,13 +29,23 @@ const PhotoEssayGeneration = () => {
     setUploadedFile(file);
     console.log('File uploaded:', file.name);
     setIsUploading(true);
-    // 调用后端识别内容后生成题目
-    const base64Data = await convertFileToBase64(file);
-    console.log('Starting essay generation from image...');
-    const topic = await generateTopicFromImage(base64Data);
-    console.log('Topic generated:', topic);
-    setIsUploading(false);
-    setTopic(topic);
+    
+    try {
+      // 调用后端识别内容后生成题目
+      const base64Data = await convertFileToBase64(file);
+      console.log('Starting essay generation from image...');
+      const topic = await generateTopicFromImage(base64Data);
+      console.log('Topic generated:', topic);
+      setTopic(topic);
+    } catch (error) {
+      console.error('Topic recognition error:', error);
+      toast.error('识别失败', {
+        description: '图片识别失败或超时，请重新上传'
+      });
+      setTopic(null);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const convertFileToBase64 = (file: File): Promise<string> => {
@@ -138,6 +148,14 @@ const PhotoEssayGeneration = () => {
                   onFileSelect={handleFileUpload}
                   selectedFile={uploadedFile}
                 />
+                
+                {/* Upload Status Indicator */}
+                {isUploading && (
+                  <div className="flex items-center justify-center mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-600 mr-2" />
+                    <span className="text-blue-700 font-medium">正在识别题目图片...</span>
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 {!isUploading && 
@@ -153,7 +171,7 @@ const PhotoEssayGeneration = () => {
                   </Button>
                   <Button 
                     onClick={handleStartGeneration}
-                    disabled={!uploadedFile || isGenerating}
+                    disabled={!uploadedFile || !topic || isGenerating}
                     className="gradient-bg text-white text-xs sm:text-sm w-full sm:w-auto order-1 sm:order-2"
                     size="sm"
                   >

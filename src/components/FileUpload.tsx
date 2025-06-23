@@ -108,22 +108,12 @@ const FileUpload = ({ onFileSelect, selectedFile }: FileUploadProps) => {
         </Card>
       ) : (
         <Card className="bg-green-50 border-green-200">
-          <CardContent className="flex items-center justify-between py-4">
-            <div className="flex items-center">
-              <File className="w-8 h-8 text-green-600 mr-3" />
-              <div>
-                <p className="font-medium text-green-800">{selectedFile.name}</p>
-                <p className="text-sm text-green-600">{formatFileSize(selectedFile.size)}</p>
-              </div>
+          <CardContent className="flex items-center py-4">
+            <File className="w-8 h-8 text-green-600 mr-3" />
+            <div>
+              <p className="font-medium text-green-800">{selectedFile.name}</p>
+              <p className="text-sm text-green-600">{formatFileSize(selectedFile.size)}</p>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={clearFile}
-              className="text-green-600 hover:text-green-800"
-            >
-              <X className="w-4 h-4" />
-            </Button>
           </CardContent>
         </Card>
       )}
