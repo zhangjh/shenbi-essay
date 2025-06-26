@@ -106,8 +106,8 @@ const Index = () => {
         {/* Footer */}
         <footer className="bg-gray-800 text-white py-8 md:py-12">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-            {/* Desktop: 4 columns, Mobile: 2 columns */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            {/* Desktop: 5 columns, Mobile: 2 columns */}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-8">
               {/* Logo and description - spans 2 columns on mobile */}
               <div className="col-span-2 lg:col-span-1">
                 <div className="flex items-center space-x-2 mb-4">
@@ -138,6 +138,23 @@ const Index = () => {
                   <li>初中作文</li>
                   <li>高中作文</li>
                   <li>高考真题</li>
+                </ul>
+              </div>
+              
+              {/* Friendly links column */}
+              <div className="col-span-1">
+                <h4 className="font-semibold mb-4 text-sm">友情链接</h4>
+                <ul className="space-y-2 text-gray-400 text-sm">
+                  <li>
+                    <a 
+                      href="https://report.shenbi.tech" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-white transition-colors underline"
+                    >
+                      神笔周报
+                    </a>
+                  </li>
                 </ul>
               </div>
               
