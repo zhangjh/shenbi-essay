@@ -29,7 +29,7 @@ const TopicAnalysis = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showEssayDialog, setShowEssayDialog] = useState(false);
-  const [showFeatureDialog, setShowFeatureDialog] = useState(false);
+
   const [essays, setEssays] = useState<Essay[]>([]);
   const [selectedEssayId, setSelectedEssayId] = useState<string>('');
   const [loadingEssay, setLoadingEssay] = useState(false);
@@ -72,8 +72,7 @@ const TopicAnalysis = () => {
 
   const handleStartWriting = () => {
     if (!id) return;
-    // navigate(`/topic/${id}/write`);
-    setShowFeatureDialog(true);
+    navigate(`/topic/${id}/write`);
   };
 
   const handleViewEssay = async () => {
@@ -379,20 +378,6 @@ const TopicAnalysis = () => {
           </DialogContent>
         </Dialog>
         
-        {/* 功能未实现提示弹框 */}
-        <Dialog open={showFeatureDialog} onOpenChange={setShowFeatureDialog}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>功能提示</DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <p className="text-center text-gray-700">该功能暂未实现，敬请期待！</p>
-            </div>
-            <div className="flex justify-center">
-              <Button onClick={() => setShowFeatureDialog(false)}>确定</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );
