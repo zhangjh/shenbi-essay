@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ const MindMap = lazy(() => import('@/components/MindMap'));
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { toast } from 'sonner';
 
 interface Essay {
   id: string;
@@ -25,6 +27,7 @@ interface Essay {
 const TopicAnalysis = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useUser();
   const [topic, setTopic] = useState<EssayTopic | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,6 +75,10 @@ const TopicAnalysis = () => {
 
   const handleStartWriting = () => {
     if (!id) return;
+    if (!user) {
+      toast.error('请先登录后再开始写作');
+      return;
+    }
     navigate(`/topic/${id}/write`);
   };
 
