@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, BookOpen, Save, Eye, PenTool, Target, Lightbulb, Brain, Send, Share2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, PenTool, Target, Lightbulb, Brain, Send, Share2, Loader2, FileText } from 'lucide-react';
 import { fetchTopicById, EssayTopic } from '@/services/topicService';
 import Header from '@/components/Header';
 import WritingGuide from '@/components/WritingGuide';
@@ -41,6 +41,10 @@ const Writing = () => {
   const [showGradingResult, setShowGradingResult] = useState(false);
   const [gradingResult, setGradingResult] = useState('');
   const [essayId, setEssayId] = useState<string | null>(null);
+  const [myEssays, setMyEssays] = useState<any[]>([]);
+  const [loadingEssays, setLoadingEssays] = useState(false);
+  const [showMyEssay, setShowMyEssay] = useState(false);
+  const [selectedEssay, setSelectedEssay] = useState<any>(null);
 
   useEffect(() => {
     const loadTopic = async () => {
@@ -75,7 +79,27 @@ const Writing = () => {
     };
 
     loadTopic();
-  }, [id]);
+    loadMyEssays();
+  }, [id, user?.id]);
+
+  const loadMyEssays = async () => {
+    if (!user?.id || !id) return;
+    
+    try {
+      setLoadingEssays(true);
+      const response = await fetch(`${API_BASE_URL}/shenbi/essay/?topic_id=${id}&author=${user.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setMyEssays(data.data || []);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading my essays:', err);
+    } finally {
+      setLoadingEssays(false);
+    }
+  };
 
   useEffect(() => {
     // 计算字数（统计所有可见字符，排除空白字符）
@@ -117,6 +141,7 @@ const Writing = () => {
           topic_id: id,
           source: 'user',
           author: user?.id || 'anonymous',
+          author_name: user?.fullName || user?.emailAddresses[0].emailAddress || 'Anonymous',
           shared: 0,
           essay: content
         })
@@ -126,10 +151,12 @@ const Writing = () => {
       if (!submitData.success) {
         throw new Error('提交失败');
       }
-      
+
       setEssayId(submitData.data.id);
       toast.success('作文提交成功！');
       localStorage.removeItem(`essay_draft_${id}`);
+      // 重新加载我的作文列表
+      loadMyEssays();
       
       // 2. 请求评阅
       setGrading(true);
@@ -151,6 +178,21 @@ const Writing = () => {
         const gradingText = await gradingResponse.text();
         setGradingResult(gradingText);
         setShowGradingResult(true);
+        // 更新评阅结论到文章
+        const updateResponse = await fetch(`${API_BASE_URL}/shenbi/essay/update`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: submitData.data.id,
+            comment: gradingText
+          })
+        });
+        
+        if (!updateResponse.ok) {
+          throw new Error('更新评阅结论失败');
+        }
       } else {
         toast.error('评阅失败，但作文已提交成功');
       }
@@ -364,6 +406,58 @@ const Writing = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* 我的写作 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <FileText className="w-5 h-5 mr-2 text-primary" />
+                  我的写作
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingEssays ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    <span className="text-sm text-gray-600">加载中...</span>
+                  </div>
+                ) : myEssays.length > 0 ? (
+                  <div className="space-y-3">
+                    {myEssays.slice(0, 3).map((essay, index) => (
+                      <div 
+                        key={essay.id} 
+                        className="p-3 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100 transition-colors"
+                        onClick={() => {
+                          setSelectedEssay(essay);
+                          setShowMyEssay(true);
+                        }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-800">
+                            编号 {essay.id}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(essay.create_time).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600 line-clamp-2">
+                          {essay.essay.substring(0, 50)}...
+                        </p>
+                      </div>
+                    ))}
+                    {myEssays.length > 3 && (
+                      <p className="text-xs text-gray-500 text-center">
+                        共 {myEssays.length} 篇作文
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    还没有写过这个题目
+                  </p>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -436,6 +530,38 @@ const Writing = () => {
                 {sharing ? '分享中...' : '分享到社区'}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* 我的作文查看对话框 */}
+      <Dialog open={showMyEssay} onOpenChange={setShowMyEssay}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>我的作文 - 编号 {selectedEssay?.id}</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 space-y-4">
+            <div className="text-sm text-gray-500">
+              创建时间：{selectedEssay?.create_time && new Date(selectedEssay.create_time).toLocaleString()}
+            </div>
+            <div className="prose prose-sm max-w-none">
+              <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
+                {selectedEssay?.essay}
+              </div>
+            </div>
+            {selectedEssay?.comment && (
+              <div className="border-t pt-4">
+                <h4 className="font-medium text-gray-900 mb-2">评阅结果</h4>
+                <div className="prose prose-sm max-w-none">
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]}
+                  >
+                    {selectedEssay.comment}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
