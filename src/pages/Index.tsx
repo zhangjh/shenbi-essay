@@ -162,7 +162,7 @@ const Index = () => {
               <div className="col-span-2 lg:col-span-1">
                 <h4 className="font-semibold mb-4 text-sm">联系我们</h4>
                 <ul className="space-y-2 text-gray-400 text-sm">
-                  <li className="break-words">邮箱：zhangjh_initial@126.com</li>
+                  <li className="break-words">邮箱：help@shenbi.tech</li>
                   <li>
                     <button 
                       onClick={() => navigate('/admin')}

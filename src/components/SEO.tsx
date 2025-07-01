@@ -87,7 +87,7 @@ const SEO = ({
       "logo": ogImage.startsWith('http') ? ogImage : `${window.location.origin}${ogImage}`,
       "contactPoint": {
         "@type": "ContactPoint",
-        "email": "zhangjh_initial@126.com",
+        "email": "help@shenbi.tech",
         "contactType": "customer service"
       },
       "areaServed": "CN",
