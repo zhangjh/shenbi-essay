@@ -143,7 +143,7 @@ const Index = () => {
               
               {/* Friendly links column */}
               <div className="col-span-1">
-                <h4 className="font-semibold mb-4 text-sm">友情链接</h4>
+                <h4 className="font-semibold mb-4 text-sm">神笔系列</h4>
                 <ul className="space-y-2 text-gray-400 text-sm">
                   <li>
                     <a 
@@ -153,6 +153,16 @@ const Index = () => {
                       className="text-gray-400 hover:text-white transition-colors underline"
                     >
                       神笔周报
+                    </a>
+                  </li>
+                  <li>
+                    <a 
+                      href="https://job.shenbi.tech" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-white transition-colors underline"
+                    >
+                      神笔求职帮
                     </a>
                   </li>
                 </ul>
