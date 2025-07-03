@@ -8,6 +8,7 @@ import EssayTopics from '@/components/EssayTopics';
 import FeatureCard from '@/components/FeatureCard';
 import SEO from '@/components/SEO';
 import { Search, Camera, Edit } from 'lucide-react';
+import { FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -172,7 +173,6 @@ const Index = () => {
               <div className="col-span-2 lg:col-span-1">
                 <h4 className="font-semibold mb-4 text-sm">联系我们</h4>
                 <ul className="space-y-2 text-gray-400 text-sm">
-                  <li className="break-words">邮箱：help@shenbi.tech</li>
                   <li>
                     <button 
                       onClick={() => navigate('/admin')}
@@ -181,6 +181,33 @@ const Index = () => {
                       管理入口
                     </button>
                   </li>
+                  <li>
+                    <div className="flex space-x-4 justify-center">
+                      <a 
+                        href="mailto:help@shenbi.tech" 
+                        className="text-gray-400 hover:text-white transition-colors"
+                      >
+                        <FaEnvelope className="w-5 h-5" />
+                      </a>
+                      <a 
+                        href="https://github.com/zhangjh" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-white transition-colors"
+                      >
+                        <FaGithub className="w-5 h-5" />
+                      </a>
+                      <a 
+                        href="https://x.com/Dante_Chaser" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-white transition-colors"
+                      >
+                        <FaTwitter className="w-5 h-5" />
+                      </a>
+                    </div>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
