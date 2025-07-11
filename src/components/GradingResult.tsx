@@ -21,11 +21,15 @@ interface GradingResultProps {
   };
   onNewGrading: () => void;
   imageUrl?: string;
+  imageUrls?: string[];
 }
 
-const GradingResult = ({ result, onNewGrading, imageUrl }: GradingResultProps) => {
+const GradingResult = ({ result, onNewGrading, imageUrl, imageUrls = [] }: GradingResultProps) => {
   // 控制图片全屏预览
   const [showPreview, setShowPreview] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const allImages = imageUrls.length > 0 ? imageUrls : (imageUrl ? [imageUrl] : []);
 
   const exportResult = () => {
     let content = '';
@@ -65,16 +69,45 @@ ${result.detailedFeedback}
   if (result.isMarkdown && result.markdownContent) {
     return (
       <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 lg:px-6 space-y-4 sm:space-y-6 lg:space-y-8">
-        {/* 图片预览区，仅有图片时显示 */}
-        {imageUrl && (
+        {/* 多图预览区 */}
+        {allImages.length > 0 && (
           <>
-            <ImagePreviewCard 
-              imageUrl={imageUrl} 
-              onImageClick={() => setShowPreview(true)} 
-            />
+            {allImages.length === 1 ? (
+              <ImagePreviewCard 
+                imageUrl={allImages[0]} 
+                onImageClick={() => setShowPreview(true)} 
+              />
+            ) : (
+              <div className="space-y-3">
+                <div className="text-center text-sm text-gray-600">
+                  作文图片 ({allImages.length} 张)
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {allImages.map((url, index) => (
+                    <div 
+                      key={index}
+                      className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                      onClick={() => {
+                        setCurrentImageIndex(index);
+                        setShowPreview(true);
+                      }}
+                    >
+                      <img 
+                        src={url} 
+                        alt={`作文图片 ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-black/50 text-white text-xs px-1 rounded">
+                        {index + 1}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <ImageFullscreenPreview
-              src={imageUrl}
-              alt={'上传的作文图片大图'}
+              src={allImages[currentImageIndex]}
+              alt={`上传的作文图片 ${currentImageIndex + 1}`}
               show={showPreview}
               onClose={() => setShowPreview(false)}
             />
@@ -92,39 +125,66 @@ ${result.detailedFeedback}
 
   return (
     <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 lg:px-6 space-y-4 sm:space-y-6">
-      {/* 图片预览区，仅有图片上传时显示 */}
-      {imageUrl && (
+      {/* 多图预览区 */}
+      {allImages.length > 0 && (
         <>
-          <div className="flex justify-center mb-4">
-            <div
-              tabIndex={0}
-              title="点击可放大/全屏查看"
-              className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 w-full max-w-md aspect-[4/3] group cursor-zoom-in transition hover:scale-[1.02] hover:shadow-xl"
-              style={{ outline: 'none' }}
-              onClick={() => setShowPreview(true)}
-              onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setShowPreview(true)}
-            >
-              <img
-                src={imageUrl}
-                alt="上传的作文预览"
-                className="object-contain w-full h-full transition"
-                style={{ maxHeight: 360 }}
-                draggable={false}
-              />
-              {/* 放大icon */}
-              <div className="absolute right-3 bottom-3 bg-white/80 rounded-full p-2 shadow group-hover:bg-white group-hover:scale-110 transition-all">
-                <svg className="w-5 h-5 text-sky-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M9 18a9 9 0 1 1 9-9"/>
-                </svg>
+          {allImages.length === 1 ? (
+            <div className="flex justify-center mb-4">
+              <div
+                tabIndex={0}
+                title="点击可放大/全屏查看"
+                className="relative rounded-xl overflow-hidden shadow-md border border-blue-100 bg-slate-50 w-full max-w-md aspect-[4/3] group cursor-zoom-in transition hover:scale-[1.02] hover:shadow-xl"
+                style={{ outline: 'none' }}
+                onClick={() => setShowPreview(true)}
+                onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setShowPreview(true)}
+              >
+                <img
+                  src={allImages[0]}
+                  alt="上传的作文预览"
+                  className="object-contain w-full h-full transition"
+                  style={{ maxHeight: 360 }}
+                  draggable={false}
+                />
+                <div className="absolute right-3 bottom-3 bg-white/80 rounded-full p-2 shadow group-hover:bg-white group-hover:scale-110 transition-all">
+                  <svg className="w-5 h-5 text-sky-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M9 18a9 9 0 1 1 9-9"/>
+                  </svg>
+                </div>
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/60 via-white/20 to-transparent" />
               </div>
-              {/* 蒙版 */}
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-blue-50/60 via-white/20 to-transparent" />
+              <div className="text-xs text-gray-400 mt-1">上传图片预览（点击可放大全屏）</div>
             </div>
-            <div className="text-xs text-gray-400 mt-1">上传图片预览（点击可放大全屏）</div>
-          </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="text-center text-sm text-gray-600">
+                作文图片 ({allImages.length} 张)
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {allImages.map((url, index) => (
+                  <div 
+                    key={index}
+                    className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                    onClick={() => {
+                      setCurrentImageIndex(index);
+                      setShowPreview(true);
+                    }}
+                  >
+                    <img 
+                      src={url} 
+                      alt={`作文图片 ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute bottom-1 right-1 bg-black/50 text-white text-xs px-1 rounded">
+                      {index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <ImageFullscreenPreview
-            src={imageUrl}
-            alt={'上传的作文图片大图'}
+            src={allImages[currentImageIndex]}
+            alt={`上传的作文图片 ${currentImageIndex + 1}`}
             show={showPreview}
             onClose={() => setShowPreview(false)}
           />

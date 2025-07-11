@@ -7,9 +7,22 @@ import { Upload, File, X } from 'lucide-react';
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
   selectedFile: File | null;
+  selectedFiles?: File[];
+  onFilesSelect?: (files: File[]) => void;
+  onFileRemove?: (index: number) => void;
+  multiple?: boolean;
+  maxFiles?: number;
 }
 
-const FileUpload = ({ onFileSelect, selectedFile }: FileUploadProps) => {
+const FileUpload = ({ 
+  onFileSelect, 
+  selectedFile, 
+  selectedFiles = [], 
+  onFilesSelect, 
+  onFileRemove, 
+  multiple = false,
+  maxFiles = 5 
+}: FileUploadProps) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -27,8 +40,15 @@ const FileUpload = ({ onFileSelect, selectedFile }: FileUploadProps) => {
     e.preventDefault();
     setIsDragOver(false);
     
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
+    const files = Array.from(e.dataTransfer.files);
+    if (multiple && onFilesSelect) {
+      const validFiles = files.filter(isValidFile);
+      const remainingSlots = maxFiles - selectedFiles.length;
+      const filesToAdd = validFiles.slice(0, remainingSlots);
+      if (filesToAdd.length > 0) {
+        onFilesSelect([...selectedFiles, ...filesToAdd]);
+      }
+    } else if (files.length > 0) {
       const file = files[0];
       if (isValidFile(file)) {
         onFileSelect(file);
@@ -39,9 +59,19 @@ const FileUpload = ({ onFileSelect, selectedFile }: FileUploadProps) => {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      const file = files[0];
-      if (isValidFile(file)) {
-        onFileSelect(file);
+      if (multiple && onFilesSelect) {
+        const fileArray = Array.from(files);
+        const validFiles = fileArray.filter(isValidFile);
+        const remainingSlots = maxFiles - selectedFiles.length;
+        const filesToAdd = validFiles.slice(0, remainingSlots);
+        if (filesToAdd.length > 0) {
+          onFilesSelect([...selectedFiles, ...filesToAdd]);
+        }
+      } else {
+        const file = files[0];
+        if (isValidFile(file)) {
+          onFileSelect(file);
+        }
       }
     }
   };
@@ -78,9 +108,12 @@ const FileUpload = ({ onFileSelect, selectedFile }: FileUploadProps) => {
     // Note: We don't have a clear callback, so we'll just trigger with null
   };
 
+  const showUploadArea = multiple ? selectedFiles.length < maxFiles : !selectedFile;
+  const hasFiles = multiple ? selectedFiles.length > 0 : !!selectedFile;
+
   return (
     <div className="space-y-4">
-      {!selectedFile ? (
+      {showUploadArea && (
         <Card 
           className={`border-2 border-dashed transition-colors cursor-pointer ${
             isDragOver 
@@ -95,18 +128,53 @@ const FileUpload = ({ onFileSelect, selectedFile }: FileUploadProps) => {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Upload className="w-12 h-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              拖拽文件到此处或点击上传
+              {multiple ? '拖拽图片到此处或点击上传' : '拖拽文件到此处或点击上传'}
             </h3>
             <p className="text-gray-500 text-center">
-              支持 JPG、PNG 图片格式，以及 PDF、TXT 文档<br />
-              文件大小不超过 10MB
+              {multiple 
+                ? `支持 JPG、PNG 图片格式，最多${maxFiles}张图片\n文件大小不超过 10MB`
+                : '支持 JPG、PNG 图片格式，以及 PDF、TXT 文档\n文件大小不超过 10MB'
+              }
             </p>
             <Button variant="outline" className="mt-4">
-              选择文件
+              {multiple ? `选择图片 (${selectedFiles.length}/${maxFiles})` : '选择文件'}
             </Button>
           </CardContent>
         </Card>
-      ) : (
+      )}
+      
+      {/* 多图预览 */}
+      {multiple && selectedFiles.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {selectedFiles.map((file, index) => (
+            <div key={index} className="relative group">
+              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                {file.type.startsWith('image/') ? (
+                  <img 
+                    src={URL.createObjectURL(file)} 
+                    alt={file.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <File className="w-8 h-8 text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => onFileRemove?.(index)}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <p className="text-xs text-gray-600 mt-1 truncate">{file.name}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* 单文件显示 */}
+      {!multiple && selectedFile && (
         <Card className="bg-green-50 border-green-200">
           <CardContent className="flex items-center py-4">
             <File className="w-8 h-8 text-green-600 mr-3" />
@@ -121,7 +189,8 @@ const FileUpload = ({ onFileSelect, selectedFile }: FileUploadProps) => {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*,.pdf,.txt"
+        accept={multiple ? "image/*" : "image/*,.pdf,.txt"}
+        multiple={multiple}
         onChange={handleFileSelect}
         className="hidden"
       />
