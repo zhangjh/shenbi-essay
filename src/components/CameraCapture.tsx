@@ -42,6 +42,16 @@ const CameraCapture = ({
     checkMobile();
   }, []);
 
+  useEffect(() => {
+    if (isStreaming && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(err => {
+        console.error('Error playing video:', err);
+        setError('无法播放摄像头画面');
+      });
+    }
+  }, [isStreaming]);
+
   const startCamera = async () => {
     try {
       setError(null);
@@ -69,20 +79,6 @@ const CameraCapture = ({
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        // 确保视频能够播放
-        videoRef.current.onloadedmetadata = () => {
-          if (videoRef.current) {
-            videoRef.current.play().catch(err => {
-              console.error('Error playing video:', err);
-              setError('无法播放摄像头画面');
-            });
-          }
-        };
-      }
-      
       setIsStreaming(true);
       console.log('Camera started successfully');
     } catch (error) {
@@ -259,7 +255,7 @@ const CameraCapture = ({
                     autoPlay
                     playsInline
                     muted
-                    style={{ transform: isMobile ? 'scaleX(-1)' : 'none' }}
+                    style={{ transform: !isMobile ? 'scaleX(-1)' : 'none' }}
                   />
                   {error && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
