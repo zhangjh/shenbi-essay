@@ -57,20 +57,12 @@ const CameraCapture = ({
       setError(null);
       console.log('Starting camera for mobile:', isMobile);
       
-      // 移动端优先使用后置摄像头，桌面端使用前置摄像头
+      // 移动端使用较低分辨率以减少延迟
       const constraints = {
         video: {
           facingMode: isMobile ? { ideal: 'environment' } : 'user',
-          width: { 
-            min: 320,
-            ideal: isMobile ? 1280 : 1920,
-            max: 1920 
-          },
-          height: { 
-            min: 240,
-            ideal: isMobile ? 720 : 1080,
-            max: 1080 
-          }
+          width: { ideal: isMobile ? 640 : 1280 },
+          height: { ideal: isMobile ? 480 : 720 }
         },
         audio: false
       };
