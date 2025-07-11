@@ -251,11 +251,14 @@ const CameraCapture = ({
                 <div className="relative bg-black rounded-lg overflow-hidden">
                   <video
                     ref={videoRef}
-                    className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover"
+                    className={`w-full object-cover ${isMobile ? 'h-96 sm:h-[32rem]' : 'h-48 sm:h-64 md:h-80 lg:h-96'}`}
                     autoPlay
                     playsInline
                     muted
-                    style={{ transform: !isMobile ? 'scaleX(-1)' : 'none' }}
+                    style={{ 
+                      transform: !isMobile ? 'scaleX(-1)' : 'none',
+                      aspectRatio: isMobile ? '3/4' : 'auto'
+                    }}
                   />
                   {error && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
