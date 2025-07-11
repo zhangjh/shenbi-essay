@@ -57,12 +57,13 @@ const CameraCapture = ({
       setError(null);
       console.log('Starting camera for mobile:', isMobile);
       
-      // 移动端使用较低分辨率以减少延迟
+      // 移动端使用较低帧率和分辨率以减少卡顿
       const constraints = {
         video: {
           facingMode: isMobile ? { ideal: 'environment' } : 'user',
           width: { ideal: isMobile ? 640 : 1280 },
-          height: { ideal: isMobile ? 480 : 720 }
+          height: { ideal: isMobile ? 480 : 720 },
+          frameRate: { ideal: isMobile ? 15 : 30 }
         },
         audio: false
       };
@@ -101,6 +102,9 @@ const CameraCapture = ({
       });
       streamRef.current = null;
     }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     setIsStreaming(false);
     setError(null);
   };
@@ -122,7 +126,10 @@ const CameraCapture = ({
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        const imageData = canvas.toDataURL('image/jpeg', 0.6);
+        
+        // 清理canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         if (multiple && onImagesCapture) {
           const newImages = [...capturedImages, imageData];
@@ -141,9 +148,18 @@ const CameraCapture = ({
   };
 
   const retakePhoto = () => {
-    if (multiple && onImagesCapture) {
-      onImagesCapture([]);
+    // 清理旧图片URL
+    if (multiple) {
+      capturedImages.forEach(img => {
+        if (img.startsWith('blob:')) {
+          URL.revokeObjectURL(img);
+        }
+      });
+      onImagesCapture?.([]);
     } else {
+      if (capturedImage && capturedImage.startsWith('blob:')) {
+        URL.revokeObjectURL(capturedImage);
+      }
       onImageCapture('');
     }
     startCamera();
