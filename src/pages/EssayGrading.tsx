@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, FileText, Lock, Upload, Camera } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { compressImageFileToBase64, compressBase64ToBase64 } from '@/lib/utils';
 
 const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
 
@@ -99,6 +100,16 @@ const EssayGrading = () => {
     return '';
   };
 
+  // 将图片文件压缩后转为base64
+  const compressFileToBase64 = (file: File): Promise<string> => {
+    if (file.type.startsWith('image/')) {
+      return compressImageFileToBase64(file, 800, 0.7);
+    } else {
+      // 非图片文件，走原始base64
+      return convertFileToBase64(file);
+    }
+  };
+
   // 提取题目信息
   const getTopicFileParams = async () => {
     if (!topicFile) return {};
@@ -129,24 +140,27 @@ const EssayGrading = () => {
 
       // 处理作文文件
       const base64Images: string[] = [];
-      
       if (uploadedFile) {
         if (uploadedFile.type === 'text/plain') {
           const essayContent = await extractTextFromFile(uploadedFile);
           requestData.essay = essayContent;
         } else {
-          const base64Data = await convertFileToBase64(uploadedFile);
+          const base64Data = await compressFileToBase64(uploadedFile);
           base64Images.push(base64Data);
         }
       } else if (uploadedFiles.length > 0) {
         for (const file of uploadedFiles) {
           if (file.type.startsWith('image/')) {
-            const base64Data = await convertFileToBase64(file);
+            const base64Data = await compressFileToBase64(file);
             base64Images.push(base64Data);
           }
         }
       } else if (capturedImages.length > 0) {
-        base64Images.push(...capturedImages.map(img => img.split(',')[1]));
+        for (const img of capturedImages) {
+          // img为base64字符串
+          const compressed = await compressBase64ToBase64(img.split(',')[1], 800, 0.7);
+          base64Images.push(compressed);
+        }
       }
       
       if (base64Images.length > 0) {
