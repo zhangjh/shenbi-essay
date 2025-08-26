@@ -7,9 +7,22 @@ import { Camera, RotateCcw, Check, X } from 'lucide-react';
 interface CameraCaptureProps {
   onImageCapture: (imageData: string) => void;
   capturedImage: string | null;
+  capturedImages?: string[];
+  onImagesCapture?: (images: string[]) => void;
+  onImageRemove?: (index: number) => void;
+  multiple?: boolean;
+  maxImages?: number;
 }
 
-const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) => {
+const CameraCapture = ({ 
+  onImageCapture = () => {}, 
+  capturedImage, 
+  capturedImages = [], 
+  onImagesCapture, 
+  onImageRemove, 
+  multiple = false,
+  maxImages = 5 
+}: CameraCaptureProps) => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,25 +42,28 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
     checkMobile();
   }, []);
 
+  useEffect(() => {
+    if (isStreaming && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(err => {
+        console.error('Error playing video:', err);
+        setError('无法播放摄像头画面');
+      });
+    }
+  }, [isStreaming]);
+
   const startCamera = async () => {
     try {
       setError(null);
       console.log('Starting camera for mobile:', isMobile);
       
-      // 移动端优先使用后置摄像头，桌面端使用前置摄像头
+      // 移动端使用较低帧率和分辨率以减少卡顿
       const constraints = {
         video: {
           facingMode: isMobile ? { ideal: 'environment' } : 'user',
-          width: { 
-            min: 320,
-            ideal: isMobile ? 1280 : 1920,
-            max: 1920 
-          },
-          height: { 
-            min: 240,
-            ideal: isMobile ? 720 : 1080,
-            max: 1080 
-          }
+          width: { ideal: isMobile ? 640 : 1280 },
+          height: { ideal: isMobile ? 480 : 720 },
+          frameRate: { ideal: isMobile ? 15 : 30 }
         },
         audio: false
       };
@@ -56,20 +72,6 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        // 确保视频能够播放
-        videoRef.current.onloadedmetadata = () => {
-          if (videoRef.current) {
-            videoRef.current.play().catch(err => {
-              console.error('Error playing video:', err);
-              setError('无法播放摄像头画面');
-            });
-          }
-        };
-      }
-      
       setIsStreaming(true);
       console.log('Camera started successfully');
     } catch (error) {
@@ -100,6 +102,9 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
       });
       streamRef.current = null;
     }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     setIsStreaming(false);
     setError(null);
   };
@@ -121,75 +126,86 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL('image/jpeg', 0.8);
-        onImageCapture(imageData);
-        stopCamera();
+        const imageData = canvas.toDataURL('image/jpeg', 0.6);
+        
+        // 清理canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (multiple && onImagesCapture) {
+          const newImages = [...capturedImages, imageData];
+          onImagesCapture(newImages);
+          // 多图模式下继续拍照
+          if (newImages.length >= maxImages) {
+            stopCamera();
+          }
+        } else {
+          onImageCapture(imageData);
+          stopCamera();
+        }
         console.log('Photo captured successfully');
       }
     }
   };
 
   const retakePhoto = () => {
-    onImageCapture('');
+    // 清理旧图片URL
+    if (multiple) {
+      capturedImages.forEach(img => {
+        if (img.startsWith('blob:')) {
+          URL.revokeObjectURL(img);
+        }
+      });
+      onImagesCapture?.([]);
+    } else {
+      if (capturedImage && capturedImage.startsWith('blob:')) {
+        URL.revokeObjectURL(capturedImage);
+      }
+      onImageCapture('');
+    }
     startCamera();
   };
 
+  const canTakeMore = multiple ? capturedImages.length < maxImages : false;
+  const hasImages = multiple ? capturedImages.length > 0 : !!capturedImage;
+
   return (
     <div className="space-y-3 sm:space-y-4">
-      {!capturedImage ? (
-        <Card>
-          <CardContent className="p-3 sm:p-4 lg:p-6">
-            {!isStreaming ? (
-              <div className="text-center py-6 sm:py-8 lg:py-12">
-                <Camera className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">
-                  使用摄像头拍照
-                </h3>
-                <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 px-2">
-                  {isMobile ? '点击下方按钮开启摄像头拍照' : '需要摄像头权限来拍摄作文'}
-                </p>
-                {error && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-600">{error}</p>
-                  </div>
-                )}
-                <Button onClick={startCamera} className="gradient-bg text-white text-sm sm:text-base">
-                  <Camera className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                  开启摄像头
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3 sm:space-y-4">
-                <div className="relative bg-black rounded-lg overflow-hidden">
-                  <video
-                    ref={videoRef}
-                    className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover"
-                    autoPlay
-                    playsInline
-                    muted
-                    style={{ transform: isMobile ? 'scaleX(-1)' : 'none' }}
+      {/* 多图已拍摄预览 */}
+      {multiple && capturedImages.length > 0 && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-blue-800">
+                已拍摄 {capturedImages.length}/{maxImages} 张
+              </h4>
+              <Button variant="outline" onClick={retakePhoto} size="sm">
+                <RotateCcw className="w-3 h-3 mr-1" />
+                <span className="text-xs">重新拍照</span>
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {capturedImages.map((image, index) => (
+                <div key={index} className="relative group aspect-square">
+                  <img 
+                    src={image} 
+                    alt={`拍摄 ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg"
                   />
-                  {error && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
-                      <p className="text-white text-sm text-center px-4">{error}</p>
-                    </div>
-                  )}
+                  <button
+                    onClick={() => onImageRemove?.(index)}
+                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </div>
-                <div className="flex justify-center space-x-3 sm:space-x-4">
-                  <Button variant="outline" onClick={stopCamera} size="sm">
-                    <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    <span className="text-xs sm:text-sm">取消</span>
-                  </Button>
-                  <Button onClick={capturePhoto} className="gradient-bg text-white" size="sm">
-                    <Camera className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    <span className="text-xs sm:text-sm">拍照</span>
-                  </Button>
-                </div>
-              </div>
-            )}
+              ))}
+            </div>
           </CardContent>
         </Card>
-      ) : (
+      )}
+      
+      {/* 单图已拍摄预览 */}
+      {!multiple && capturedImage && (
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="p-3 sm:p-4 lg:p-6">
             <div className="space-y-3 sm:space-y-4">
@@ -211,6 +227,67 @@ const CameraCapture = ({ onImageCapture, capturedImage }: CameraCaptureProps) =>
                 </Button>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* 拍照界面 */}
+      {((!multiple && !capturedImage) || (multiple && canTakeMore)) && (
+        <Card>
+          <CardContent className="p-3 sm:p-4 lg:p-6">
+            {!isStreaming ? (
+              <div className="text-center py-6 sm:py-8 lg:py-12">
+                <Camera className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">
+                  {multiple ? `拍摄作文照片 (${capturedImages.length}/${maxImages})` : '使用摄像头拍照'}
+                </h3>
+                <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 px-2">
+                  {isMobile ? '点击下方按钮开启摄像头拍照' : '需要摄像头权限来拍摄作文'}
+                </p>
+                {error && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
+                <Button onClick={startCamera} className="gradient-bg text-white text-sm sm:text-base">
+                  <Camera className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                  开启摄像头
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3 sm:space-y-4">
+                <div className="relative bg-black rounded-lg overflow-hidden">
+                  <video
+                    ref={videoRef}
+                    className={`w-full object-cover ${isMobile ? 'h-96 sm:h-[32rem]' : 'h-48 sm:h-64 md:h-80 lg:h-96'}`}
+                    autoPlay
+                    playsInline
+                    muted
+                    style={{ 
+                      transform: !isMobile ? 'scaleX(-1)' : 'none',
+                      aspectRatio: isMobile ? '3/4' : 'auto'
+                    }}
+                  />
+                  {error && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
+                      <p className="text-white text-sm text-center px-4">{error}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-center space-x-3 sm:space-x-4">
+                  <Button variant="outline" onClick={stopCamera} size="sm">
+                    <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="text-xs sm:text-sm">取消</span>
+                  </Button>
+                  <Button onClick={capturePhoto} className="gradient-bg text-white" size="sm">
+                    <Camera className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="text-xs sm:text-sm">
+                      {multiple ? `拍照 (${capturedImages.length + 1}/${maxImages})` : '拍照'}
+                    </span>
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

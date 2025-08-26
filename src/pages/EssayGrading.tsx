@@ -4,11 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
+import CameraCapture from '@/components/CameraCapture';
 import GradingResult from '@/components/GradingResult';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, FileText, Lock } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, FileText, Lock, Upload, Camera } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { compressImageFileToBase64, compressBase64ToBase64 } from '@/lib/utils';
 
 const API_BASE_URL = import.meta.env.VITE_BIZ_DOMAIN + '/shenbi';
 
@@ -18,7 +21,7 @@ interface GradingRequest {
   level: string;
   weight: number;
   essay?: string;
-  fileImg?: string;
+  fileImgs?: string[];
   topicText?: string;
   topicImg?: string;
   userId: string;
@@ -34,10 +37,15 @@ const EssayGrading = () => {
   const { user } = useUser();
   // 作文文件
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  // 作文多图文件
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  // 拍照图片
+  const [capturedImages, setCapturedImages] = useState<string[]>([]);
   // 题目文件（可选）
   const [topicFile, setTopicFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [gradingResult, setGradingResult] = useState<GradingResult>(null);
+  const [activeTab, setActiveTab] = useState('upload');
 
   // 处理题目上传
   const handleTopicUpload = (file: File) => {
@@ -45,10 +53,34 @@ const EssayGrading = () => {
     console.log('题目文件已上传:', file.name);
   };
 
-  // 处理作文上传
+  // 处理作文上传（单文件）
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
     console.log('作文文件已上传:', file.name);
+  };
+
+  // 处理多图上传
+  const handleFilesUpload = (files: File[]) => {
+    setUploadedFiles(files);
+    console.log('作文多图已上传:', files.length, '张');
+  };
+
+  // 删除上传的图片
+  const handleFileRemove = (index: number) => {
+    const newFiles = uploadedFiles.filter((_, i) => i !== index);
+    setUploadedFiles(newFiles);
+  };
+
+  // 处理拍照图片
+  const handleImagesCapture = (images: string[]) => {
+    setCapturedImages(images);
+    console.log('已拍摄:', images.length, '张图片');
+  };
+
+  // 删除拍照图片
+  const handleImageRemove = (index: number) => {
+    const newImages = capturedImages.filter((_, i) => i !== index);
+    setCapturedImages(newImages);
   };
 
   const convertFileToBase64 = (file: File): Promise<string> => {
@@ -71,6 +103,16 @@ const EssayGrading = () => {
     return '';
   };
 
+  // 将图片文件压缩后转为base64
+  const compressFileToBase64 = (file: File): Promise<string> => {
+    if (file.type.startsWith('image/')) {
+      return compressImageFileToBase64(file, 800, 0.7);
+    } else {
+      // 非图片文件，走原始base64
+      return convertFileToBase64(file);
+    }
+  };
+
   // 提取题目信息
   const getTopicFileParams = async () => {
     if (!topicFile) return {};
@@ -86,7 +128,9 @@ const EssayGrading = () => {
 
   // 批改流程
   const handleStartGrading = async () => {
-    if (!uploadedFile) return;
+    const hasFiles = uploadedFile || uploadedFiles.length > 0 || capturedImages.length > 0;
+    if (!hasFiles) return;
+    
     setIsAnalyzing(true);
 
     try {
@@ -99,12 +143,32 @@ const EssayGrading = () => {
       };
 
       // 处理作文文件
-      if (uploadedFile.type === 'text/plain') {
-        const essayContent = await extractTextFromFile(uploadedFile);
-        requestData.essay = essayContent;
-      } else {
-        const base64Data = await convertFileToBase64(uploadedFile);
-        requestData.fileImg = base64Data;
+      const base64Images: string[] = [];
+      if (uploadedFile) {
+        if (uploadedFile.type === 'text/plain') {
+          const essayContent = await extractTextFromFile(uploadedFile);
+          requestData.essay = essayContent;
+        } else {
+          const base64Data = await compressFileToBase64(uploadedFile);
+          base64Images.push(base64Data);
+        }
+      } else if (uploadedFiles.length > 0) {
+        for (const file of uploadedFiles) {
+          if (file.type.startsWith('image/')) {
+            const base64Data = await compressFileToBase64(file);
+            base64Images.push(base64Data);
+          }
+        }
+      } else if (capturedImages.length > 0) {
+        for (const img of capturedImages) {
+          // img为base64字符串
+          const compressed = await compressBase64ToBase64(img.split(',')[1], 800, 0.7);
+          base64Images.push(compressed);
+        }
+      }
+      
+      if (base64Images.length > 0) {
+        requestData.fileImgs = base64Images;
       }
 
       // 处理题目（可选）
@@ -152,10 +216,40 @@ const EssayGrading = () => {
 
   const handleReset = () => {
     setUploadedFile(null);
+    setUploadedFiles([]);
+    setCapturedImages([]);
     setTopicFile(null);
     setGradingResult(null);
     setIsAnalyzing(false);
   };
+
+  // 获取所有图片URL用于结果显示
+  const getAllImageUrls = () => {
+    const urls: string[] = [];
+    
+    // 上传的图片文件
+    if (uploadedFiles.length > 0) {
+      uploadedFiles.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          urls.push(URL.createObjectURL(file));
+        }
+      });
+    }
+    
+    // 拍照的图片
+    if (capturedImages.length > 0) {
+      urls.push(...capturedImages);
+    }
+    
+    // 单文件模式的图片
+    if (uploadedFile && uploadedFile.type.startsWith('image/')) {
+      urls.push(URL.createObjectURL(uploadedFile));
+    }
+    
+    return urls;
+  };
+
+  const hasAnyFiles = uploadedFile || uploadedFiles.length > 0 || capturedImages.length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
@@ -215,13 +309,42 @@ const EssayGrading = () => {
                     selectedFile={topicFile}
                   />
                 </div>
-                {/* 作文上传（必填） */}
+                
+                {/* 作文上传方式选择 */}
                 <div>
-                  <div className="text-gray-800 text-sm mb-2 font-medium">上传作文文件（必填）</div>
-                  <FileUpload
-                    onFileSelect={handleFileUpload}
-                    selectedFile={uploadedFile}
-                  />
+                  <div className="text-gray-800 text-sm mb-3 font-medium">上传作文（必填）</div>
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="upload" className="flex items-center gap-2">
+                        <Upload className="w-4 h-4" />
+                        多图上传
+                      </TabsTrigger>
+                      <TabsTrigger value="camera" className="flex items-center gap-2">
+                        <Camera className="w-4 h-4" />
+                        拍照上传
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="upload" className="mt-4">
+                      <FileUpload
+                        onFilesSelect={handleFilesUpload}
+                        onFileRemove={handleFileRemove}
+                        selectedFiles={uploadedFiles}
+                        multiple={true}
+                        maxFiles={5}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="camera" className="mt-4">
+                      <CameraCapture
+                        onImagesCapture={handleImagesCapture}
+                        onImageRemove={handleImageRemove}
+                        capturedImages={capturedImages}
+                        multiple={true}
+                        maxImages={5}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </div>
 
                 {/* 操作按钮 */}
@@ -229,7 +352,7 @@ const EssayGrading = () => {
                   <Button
                     variant="outline"
                     onClick={handleReset}
-                    disabled={!uploadedFile && !topicFile}
+                    disabled={!hasAnyFiles && !topicFile}
                     size="sm"
                     className="text-xs sm:text-sm w-full sm:w-auto order-2 sm:order-1"
                   >
@@ -237,7 +360,7 @@ const EssayGrading = () => {
                   </Button>
                   <Button
                     onClick={handleStartGrading}
-                    disabled={!uploadedFile || isAnalyzing}
+                    disabled={!hasAnyFiles || isAnalyzing}
                     className="gradient-bg text-white text-xs sm:text-sm w-full sm:w-auto order-1 sm:order-2"
                     size="sm"
                   >
@@ -250,11 +373,7 @@ const EssayGrading = () => {
             <GradingResult
               result={gradingResult}
               onNewGrading={handleReset}
-              imageUrl={
-                uploadedFile && uploadedFile.type.startsWith('image/')
-                  ? URL.createObjectURL(uploadedFile)
-                  : undefined
-              }
+              imageUrls={getAllImageUrls()}
             />
           )}
         </SignedIn>
