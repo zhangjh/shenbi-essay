@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import Header from '@/components/Header';
@@ -20,6 +21,7 @@ interface GradingRequest {
   fileImg?: string;
   topicText?: string;
   topicImg?: string;
+  userId: string;
 }
 
 interface GradingResult {
@@ -29,6 +31,7 @@ interface GradingResult {
 
 const EssayGrading = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   // 作文文件
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   // 题目文件（可选）
@@ -91,7 +94,8 @@ const EssayGrading = () => {
         title: '',
         description: '',
         level: '',
-        weight: 100
+        weight: 100,
+        userId: user?.id || 'anonymous',
       };
 
       // 处理作文文件

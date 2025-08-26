@@ -170,7 +170,8 @@ const Writing = () => {
           title: topic?.title,
           description: topic?.description,
           level: topic?.grade,
-          weight: 100
+          weight: 100,
+          userId: user?.id || 'anonymous'
         })
       });
       
