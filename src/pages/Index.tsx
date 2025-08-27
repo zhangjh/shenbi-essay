@@ -40,7 +40,7 @@ const Index = () => {
 
   // 首页SEO参数
   const seoTitle = "神笔作文 - 中小学生作文学习平台 | 智能批改 题目解析 写作指导";
-  const seoDesc = "神笔作文是专为中小学生打造的作文学习平台，提供智能批改、题目解析、范文学习、拍照生成范文等功能。涵盖小学、初中、高中各年级，助力学生提升写作水平。";
+  const seoDesc = "神笔作文是专为中小学生打造的智能作文学习平台，提供AI智能批改、题目深度解析、范文学习、拍照生成范文等全方位写作支持。覆盖小学、初中、高中各年级，帮助学生快速提升写作水平，掌握写作技巧。";
   const seoKeywords = "作文学习,作文批改,作文题目,小学作文,初中作文,高中作文,智能批改,写作指导,作文范文,记叙文,议论文,说明文";
   const canonicalUrl = window.location.origin + '/';
 
@@ -61,9 +61,17 @@ const Index = () => {
 
         <HeroSection />
 
-        {/* Main H1 for SEO */}
-        <section className="sr-only">
-          <h1>神笔作文 - 中小学生作文学习平台，提供智能批改、题目解析和写作指导</h1>
+
+        {/* Visible H1 for better SEO and UX */}
+        <section className="py-8 md:py-12 bg-white/30 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 leading-tight">
+              神笔作文
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              中小学生作文学习平台，提供智能批改、题目解析和写作指导
+            </p>
+          </div>
         </section>
 
         {/* Main Features Section */}

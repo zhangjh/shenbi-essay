@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import CameraCapture from '@/components/CameraCapture';
 import GradingResult from '@/components/GradingResult';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -251,9 +252,26 @@ const EssayGrading = () => {
 
   const hasAnyFiles = uploadedFile || uploadedFiles.length > 0 || capturedImages.length > 0;
 
+  // 批改页面SEO参数
+  const seoTitle = "智能作文批改 - 神笔作文 | AI智能批改 专业写作指导";
+  const seoDesc = "神笔作文智能批改系统，支持拍照上传、文档上传等多种方式，提供专业的AI作文批改服务。包含详细的评分、修改建议、写作技巧指导，帮助学生快速提升写作水平。";
+  const seoKeywords = "作文批改,智能批改,AI批改,作文评分,写作指导,作文修改,拍照批改,作文学习";
+  const canonicalUrl = window.location.origin + '/grading';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
-      <Header />
+    <>
+      {/* SEO标签渲染 */}
+      <SEO
+        title={seoTitle}
+        description={seoDesc}
+        keywords={seoKeywords}
+        canonical={canonicalUrl}
+        ogImage={'/assets/logo.png'}
+        ogType="website"
+      />
+
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
+        <Header />
 
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Header */}
@@ -379,6 +397,7 @@ const EssayGrading = () => {
         </SignedIn>
       </div>
     </div>
+    </>
   );
 };
 
